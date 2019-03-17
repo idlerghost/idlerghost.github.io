@@ -13,15 +13,98 @@
         gtag('js', new Date());
 
         gtag('config', 'UA-132349739-1');
+        
     </script>
+
+    <script src="jquery.js"></script> 
+    <script> 
+    $(function(){
+    $("#includedContent").load("games/tetris/index.html"); 
+    });
+    </script> 
+
 
     <title>Tetris - Idler Ghost</title>
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
     <link rel="icon" href="images/favicon.png">
+
+    <style>
+            /* Disable user selection to avoid strange bug in Chrome on Windows:
+            * Selecting a text outside the canvas, then clicking+draging would
+            * drag the selected text but block mouse down/up events to the engine.
+            */
+            body {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        
+            /* DEF-3413
+            * The Facebook container will be populated with the Facebook SDK content
+            * when a Facebook App Id is provided in game.project.
+            * This caused problems with selections in Chrome on Windows, just like
+            * above. Explicitly disabling selection on the root div fixes the issue.
+            */
+            .fb-root {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        
+            .canvas-app-container {
+                background: rgb(255,255,255) no-repeat center url("games/try/try_game.png");
+                /* A positioned parent for loading visuals */
+                position: relative;
+            }
+        
+            .canvas-app-container:-webkit-full-screen {
+                /* Auto width and height in Safari/Chrome fullscreen. */
+                width: auto;
+                height: auto;
+            }
+        
+            .canvas-app-canvas {
+                max-height: 100vh;
+                max-width: 100%;
+            }
+        
+            .canvas-app-progress {
+                position: absolute;
+                background-color: rgb(245, 245, 245);
+                height: 20px;
+                /* Progress same width as canvas. */
+                width: 475px;
+                bottom: 0px;
+            }
+        
+            .canvas-app-progress-bar {
+                font-size: 12px;
+                height: 20px;
+                color: rgb(255, 255, 255);
+                background-color: rgb(30, 100, 234);
+                text-align: center;
+                line-height: 20px;
+            }
+        
+            .button {
+                color: #fff;
+                background-color: #1e64ea;
+                border-color: transparent;
+                padding: 10px 20px;
+            }
+            </style>
+
 
 </head>
 
@@ -68,14 +151,70 @@
                     Defold</a>. I thank the community for helping me with my doubts, because, man, they
                     are fast.</p>
 
-                    <p>This was heavily based on <a href="https://github.com/joachimvalente/defold-tetris">
-                    Joachim Valente Tetris implementation</a> as I was starting to learn about Lua and the
-                    Defold plataform.</p>
-
                     <p>As the project is still under development, so is this page, so at
                     the moment there may not be much information available.
                     </p>
                     <hr />
+
+                    <h4>The Game</h4>
+                    <div id="fb-root" class="fb-root"></div>
+
+                    <div id="app-container" class="canvas-app-container">
+                        <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="475" height="550"></canvas>
+                    </div>
+                                
+                    <!-- -->
+                    
+                    <script type='text/javascript' src="games/tetris/dmloader.js"></script>
+                    <!-- -->
+                
+                    <script type='text/javascript'>
+                    var extra_params = {
+                        archive_location_filter: function( path ) {
+                            return ("games/tetris/archive" + path + "");
+                        },
+                        
+                        splash_image: "games/tetris/splash_image.png",
+                        custom_heap_size: 268435456,
+                        disable_context_menu: true
+                    }
+                
+                    Module['onRuntimeInitialized'] = function() {
+                        Module.runApp("canvas", extra_params);
+                    };
+                
+                    Module["locateFile"] = function(path, scriptDirectory)
+                    {
+                        // dmengine*.wasm is hardcoded in the built JS loader for WASM,
+                        // we need to replace it here with the correct project name.
+                        if (path == "dmengine.wasm" || path == "dmengine_release.wasm" || path == "dmengine_headless.wasm") {
+                            path = "Tetris.wasm";
+                        }
+                        return scriptDirectory + path;
+                    };
+                
+                    function load_engine() {
+                        var engineJS = document.createElement('script');
+                        engineJS.type = 'text/javascript';
+                        if (Module['isWASMSupported']) {
+                            engineJS.src = 'games/tetris/Tetris_wasm.js';
+                        } else {
+                            engineJS.src = 'games/tetris/Tetris_asmjs.js';
+                        }
+                        document.head.appendChild(engineJS);
+                    }
+                
+                    if (false) {
+                        // Load Facebook API
+                        var fb = document.createElement('script');
+                        fb.type = 'text/javascript';
+                        fb.src = '//connect.facebook.net/en_US/sdk.js';
+                        fb.onload = load_engine;
+                        document.head.appendChild(fb);
+                    } else {
+                        load_engine();
+                    }
+                    </script>
 
                     <h4>Project Development</h4>
 
@@ -83,6 +222,13 @@
 
                     <p>The complete code can be found in my <a href="https://github.com/idlerghost/DefoldTetris" target="_blank" 
                         class="icon fa-github">Github page</a></p>
+                    
+                    <h4>References</h4>
+
+                    <ul>
+                        <li><a href="https://github.com/joachimvalente/defold-tetris">
+                            Joachim Valente Tetris implementation</a></li>
+                    </ul>
 
                 </div>
             </section>
