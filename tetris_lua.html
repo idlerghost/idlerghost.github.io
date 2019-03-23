@@ -165,13 +165,12 @@
                     Defold</a>. I thank the community for helping me with my doubts, because, man, they
                     are fast.</p>
 
-                    <p>As the project is still under development, so is this page, so at
-                    the moment there may not be much information available.
-                    </p>
                     <hr />
 
-                    <h4>The Game</h4>
-                    <div id="fb-root" class="fb-root"></div>
+                    <h4 id="play_game">The Game</h4>
+
+                    <p>First, lets get straight to the results. If you feel like it, give it a try</p>
+                    <center><div id="fb-root" class="fb-root"></div>
 
                     <div id="app-container" class="canvas-app-container">
                         <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="475" height="550"></canvas>
@@ -228,11 +227,548 @@
                     } else {
                         load_engine();
                     }
-                    </script>
+                    </script></center>
 
-                    <h4>Project Development</h4>
+                    <hr />
+                    <h4>Introduction</h4>
+
+                    <p>I think the most important thing before coding is to know what you are supposed to make.
+                        So let's understand a bit more about tetris.
+                    </p>
+                    <blockquote cite='https://tetris.wiki/Gameplay_overview'>
+                        <p>The action of Tetris happens within a machine called a tetrion.</p>
+                        <p>The largest part of the tetrion consists of the playfield measuring 
+                            ten spaces across by twenty spaces down.</p>
+                        <p>Randomly selected tetrominoes, or shapes consisting of four 
+                            square blocks, fall from the top of the playfield one at a time. 
+                            Each tetromino enters the playfield with a given orientation and 
+                            color depending on its shape. Part of the tetrion, called the 
+                            piece preview, shows the next pieces that will enter the playfield.</p>
+                        <p>The player can rotate the falling tetromino ninety degrees at a time 
+                            within the plane of the playfield by pressing the counterclockwise or 
+                            clockwise rotation buttons, provided the piece has room to rotate. 
+                            Some versions of the game nudge the tetromino away from the wall or 
+                            other blocks in order to make room.</p>
+                        <p>The player can shift the falling tetromino sideways one space 
+                            at a time by pressing the left or right arrow or holding it 
+                            for quicker movement, provided the piece has room to move. 
+                            Pieces cannot shift through walls or other blocks.</p>
+                        <p>Each tetromino moves downward slowly by itself. 
+                            Generally a player can use some method to "drop" 
+                            the tetromino, or make it move downward faster. 
+                            Once the tetromino lands on the floor or other blocks, 
+                            the piece will delay shortly before locking in which time the 
+                            player can move it. After locking, a player can no longer 
+                            move the tetromino.</p>
+                        <p>When a tetromino locks and by doing so fills all empty spaces 
+                            within one or more rows of the playfield, those full rows 
+                            will clear. Remaining blocks above will move down by as 
+                            many rows removed.</p>
+                        <p>If the playfield has not filled up with blocks, the next piece 
+                            enters.</p>  
+                        </blockquote>
+
+                    <h4>Creating the playfield</h4>
+
+                    <p>Instead of making a 20x10 grid will be making a 22x10 one, for no
+                        special reason
+                    </p>
+                    <p>I created a tilesource called layout. Each tile is the color of one
+                        of the shapes. The tilesource was made by loading an image made of
+                        25 x 25 pixels I've made. 
+                    </p>
+                    <p>Using said the gray tile I drawed the <b>game_grid</b>, a layer of the
+                    Tile Map. It's important to remember setting z to -1 to make sure the playfield
+                    will stay behind the pieces.</p>
+                    <p>If you tried to play the game in <a href='#play_game'><b>The Game</b></a>. 
+                    You've seen the resulting grid.</p>
+
+                    <pre>
+                        <code class="wrapper.styl5">
+                                -- Initialize the game (at startup or after game over).
+                                local function reinitialize(self)
+                                
+                                    msg.post(".", "acquire_input_focus")
+                                    msg.post("/gui#gameover", "disable")
+                                
+                                    self.grid = {
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+                                    }
+                                    for x = 1,10 do
+                                        for y = 1,22 do
+                                            tilemap.set_tile("/grid#grid", "game_grid", x, y, 1)
+                                        end
+                                    end
+                                
+                                    math.randomseed(os.time())
+                                    math.random(); math.random(); math.random()  -- make it more random
+                                
+                                    create_block(self)
+                                
+                                end
+                        </code>
+                    </pre>
+
+                    <h4>Creating the Tetrominoes</h4>
+                    
+                    <p>Now that we've made the playfield. Let's make the pieces.</p>
+                    <p>First we create a lua table called <b>block</b> in which the information
+                    needed about the tetrominoes will be stored. There are 7 possible pieces</p>
+
+                    <img src="images/tetris/pieces.png" alt="Tetris Pieces and their names">
+                    
+                    <p>Each piece has it's color and will be made of one of the tiles in the tilesource
+                        used to make the grid. The tiles in the tilesource are indexed according to their
+                        position. We'll use that in our definition of the pieces.
+                    </p>
+
+                    <p>Let's say I want the I piece to be created using the second tile in the tilesource,
+                        so I'll say that the <b>block</b> number for the I piece will be 2. Also,
+                        I always want the pieces to be initialized in the top center of thee grid.
+                        That being said, we know what each piece coordinates are gonna be at the 
+                        begging, so we set that in the <b>block</b> coords.
+                    </p>
+
+                    <p id="next_block_info">To pick a piece we'll pick a random number between 2 and 8 (the position of the
+                        tiles that will be used in the tilemap). But since we have to show the user the preview
+                        of the next block, we'll have to pick that one too, the same way and make sure that the
+                        displayed block in the preview will be the created block in the next round.
+                    </p>
+                    
+                    <pre>
+                        <code class="wrapper.style5">
+                            	self.block = {}
+                                if self.next_block == nil then
+                                    self.block.number = math.random(2, 8)
+                                else
+                                    self.block.number = self.next_block
+                                end
+
+                                if self.block.number == 2 then
+                                    -- OOOO
+                                    self.block.coords = {
+                                        { x = 4, y = 22 },
+                                        { x = 5, y = 22 },
+                                        { x = 6, y = 22 },
+                                        { x = 7, y = 22 }
+                                    }
+
+                                elseif self.block.number == 3 then
+                                    -- OO
+                                    -- OO
+                                    self.block.coords = {
+                                        { x = 5, y = 22 },
+                                        { x = 6, y = 22 },
+                                        { x = 5, y = 21 },
+                                        { x = 6, y = 21 }
+                                    }
+
+                                elseif self.block.number == 4 then
+                                    -- OOO
+                                    --  O
+                                    self.block.coords = {
+                                        { x = 5, y = 22 },
+                                        { x = 6, y = 22 },
+                                        { x = 7, y = 22 },
+                                        { x = 6, y = 21 }
+                                    }
+
+                                elseif self.block.number == 5 then
+                                    --  OO
+                                    -- OO
+                                    self.block.coords = {
+                                        { x = 6, y = 22 },
+                                        { x = 7, y = 22 },
+                                        { x = 5, y = 21 },
+                                        { x = 6, y = 21 }
+                                    }
+
+                                elseif self.block.number == 6 then
+                                    -- OO
+                                    --  OO
+                                    self.block.coords = {
+                                        { x = 5, y = 22 },
+                                        { x = 6, y = 22 },
+                                        { x = 6, y = 21 },
+                                        { x = 7, y = 21 }
+                                    }
+
+                                elseif self.block.number == 7 then
+                                    -- O
+                                    -- OOO
+                                    self.block.coords = {
+                                        { x = 5, y = 22 },
+                                        { x = 5, y = 21 },
+                                        { x = 6, y = 21 },
+                                        { x = 7, y = 21 }
+                                    }
+
+                                elseif self.block.number == 8 then
+                                    --   O
+                                    -- OOO
+                                    self.block.coords = {
+                                        { x = 7, y = 22 },
+                                        { x = 5, y = 21 },
+                                        { x = 6, y = 21 },
+                                        { x = 7, y = 21 }
+                                    }
+
+                                end
+
+                            self.next_block = math.random(2, 8)
+                        </code>
+                    </pre>
+
+                    <p>So far we've defined the pieces, but there's still the need to draw them.
+                        To do that we'll use <a href='https://www.defold.com/ref/tilemap/'>
+                        Defold's tilemap functions</a>
+                    </p>
+
+                    <p>
+                        For each part of the grid that make the piece created, we'll use
+                        the tile defined in the variable <b>block</b>
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            for i,v in ipairs(self.block.coords) do
+                                if v.y < 22 then
+                                    tilemap.set_tile("/grid#grid", "game_grid", v.x, v.y + 1, self.block.number)
+                                end
+                            end
+                        </code>
+                    </pre>
+
+                    <h4>Rotating the pieces</h4>
+                    <p>To make the game playable using only the arrow keys, we'll be setting
+                        only one kind of rotation to the pieces.
+                    </p>
+                    <p>The tetrominoes should rotate around their center, so, to make sure
+                        that will happen, we define the center of each piece. After that, to
+                        make the rotation, we'll use the center's position to define the extremities.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            local function rotate(self)
+                                if self.block.number == 3 then  -- O block
+                                    return true
+                                end
+                                local nextcoords = {}
+                                local center = nil
+                                if self.block.number == 2 or self.block.number == 4 or self.block.number == 6 then
+                                    center = self.block.coords[2]
+                                elseif self.block.number == 5 then
+                                    center = self.block.coords[1]
+                                elseif self.block.number == 7 or self.block.number == 8 then
+                                    center = self.block.coords[3]
+                                end
+                            
+                                for i,v in ipairs(self.block.coords) do
+                                    local point = { x = center.x + center.y - v.y, y = center.y + v.x - center.x }
+                                    if point.x < 1 or point.x > 10 or point.y < 1 or point.y > 24 then
+                                        return false
+                                    end
+                                    if self.grid[point.x][point.y] ~= 1 then
+                                        return false
+                                    end
+                                    table.insert(nextcoords, point)
+                                end
+                                repaint(self.block, nextcoords)
+                                return true
+                            end
+                        </code>
+                    </pre>
+
+                    <h4>Controlling the pieces</h4>
+                    
+                    <p>
+                        When the user press one of the arrow keys, we want one of the following to happen:
+                    </p>
+
+                    <ul>
+                        <li><i><b>up</b></i> - The piece rotates</li>
+                        <li><i><b>left</b></i> - The piece moves to the left</li>
+                        <li><i><b>right</b></i> - The piece moves to the right</li>
+                        <li><i><b>down</b></i> - The piece falls faster</li>
+                    </ul>
+
+                    <p>There's also the special case of the space key, which, when pressed
+                        makes the piece instantly fall to the bottom.
+                    </p>
+
+                    <p>The function to make the rotation is already defined, so we can
+                        simply call that if the up arrow key is pressed. What about the down arrow key ?
+                    </p>
+
+                    <p>As the piece moves down we need to check if there's a block or if piece reached
+                        the floor, in which cases, we need to send another piece (or tetromino). If neither
+                        of those happened, then, we just need to adjust the y position of the piece.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            local function move_down(self)
+                                local nextcoords = {}
+                                for i,v in ipairs(self.block.coords) do
+                                    if v.y == 1 then
+                                        -- Reached floor.
+                                        next_block(self)
+                                        return false
+                                    end
+                                    local number = self.grid[v.x][v.y - 1]
+                                    if number ~= 1 then
+                                        -- Reached an existing block.
+                                        next_block(self)
+                                        return false
+                                    end
+                                    table.insert(nextcoords, { x = v.x, y = v.y - 1 })
+                                end
+                                repaint(self.block, nextcoords)
+                                return true
+                            end
+                        </code>
+                    </pre>
+
+                    <p>If we want to move left or right, we just need to check if will still be
+                        inside the playfield after the movement, in which case we'll just adjust
+                        the x position of the piece, otherwise, we reject the action and nothing happen.
+                    </p>
+
+                    <p>
+                        For the space key we must make the same checks as for the down arrow key, so we 
+                        can use the same function, as long as the result is fast enough.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                                function on_input(self, action_id, action)
+
+                                if action_id == hash("up") and (action.pressed or action.repeated) then	
+                                    rotate(self)
+
+                                elseif action_id == hash("down") and (action.pressed or action.repeated) then
+                                    move_down(self)
+                            
+                                elseif action_id == hash("left") and (action.pressed or action.repeated) then
+                                    local nextcoords = {}
+                                    for i,v in ipairs(self.block.coords) do
+                                        if v.x == 1 then
+                                            return
+                                        end
+                                        if self.grid[v.x - 1][v.y] ~= 1 then
+                                            return
+                                        end
+                                        table.insert(nextcoords, { x = v.x - 1, y = v.y } )
+                                    end
+                                    repaint(self.block, nextcoords)
+
+                                elseif action_id == hash("right") and (action.pressed or action.repeated) then
+                                    local nextcoords = {}
+                                    for i,v in ipairs(self.block.coords) do
+                                        if v.x == 10 then
+                                            return
+                                        end
+                                        if self.grid[v.x + 1][v.y] ~= 1 then
+                                            return
+                                        end
+                                        table.insert(nextcoords, { x = v.x + 1, y = v.y } )
+                                    end
+                                    repaint(self.block, nextcoords)
+                            
+                                elseif action_id == hash("space") and action.pressed then
+                                    while move_down(self) do
+                                    end
+                            
+                                end
+                            end
+                        </code>
+                    </pre>
+
+                    <p>There's also the fact that the tetromino should ove downward by itself
+                    as time passes. For that we can use the <b>update function</b> from Defold.</p>
+                    
+                    <pre>
+                        <code class="wrapper.style5">
+                            function update(self, dt)
+                                self.t = self.t + dt
+                                if self.t > 1 / self.speed then
+                                    move_down(self)
+                                    self.t = 0
+                                end
+                            end
+                        </code>
+                    </pre>
+
+                    <h4>Checking lines</h4>
+
+                    <p>Each time a piece reach the floor or another piece we must check
+                        if all empty spaces in a row are filled, in which the case the 
+                        row must be erased and the rows above will be moved down by as many
+                        rows were removed. Then, a new piece enters.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            local function check_lines(self)
+                                --Check every line 
+                                for y = 1,22 do
+                                    linecomplete = true
+                                    for x = 1,10 do
+                                        if self.grid[x][y] == 1 then
+                                            linecomplete = false
+                                        end
+                                    end
+
+                                    --If a line was completed, rearrange
+                                    if linecomplete then
+                                        for yy = y + 1, 22 do
+                                            for x = 1,10 do
+                                                self.grid[x][yy - 1] = self.grid[x][yy]
+                                                tilemap.set_tile("/grid#grid", "game_grid", x, yy - 1, self.grid[x][yy])
+                                            end
+                                        end
+                                        for x = 1,10 do
+                                            self.grid[x][22] = 1
+                                            tilemap.set_tile("/grid#grid", "game_grid", x, 22, 1)
+                                        end
+                                        return true
+                                    end
+                                end
+                                return false
+                            end
+                        </code>
+                    </pre>
+
+                    <h4>Game Over</h4>
+
+                    <p>If when a new block is gonna enter, there's no room for that piece,
+                        its game over. It's a check that must be made everytime a new piece
+                        is gonna enter the game, and in case of game over the user must be informed.
+                    </p>
+
+                    <p>To inform the user we create a GUI that says game over and set is as disabled,
+                        so that it will not be visible. When there's no more room for new pieces, the GUI
+                        is enable and the message is displayed to the user. We also make so that if he presses
+                        a certain key (space), the game restarts.
+                    </p>
+
+                    <p>We also create a flag, informing that the game is over, and as such,
+                        the game should stop updating.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            	for i,v in ipairs(self.block.coords) do
+                                    if self.grid[v.x][v.y] ~= 1 then
+                                        self.alive = false
+                                        msg.post("/gui#gameover", "enable")
+                                    end
+                                end
+                        </code>
+                    </pre>
+
+                    <p>If the game is over, but space key is pressed, we reinitialize it.</p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                                -- This should go inside the on_input function
+                                if not self.alive then
+                                    if action_id == hash("space") then
+                                        reinitialize(self)
+                                    end
+                                    return
+                                end
+                        </code>
+                    </pre>
+
+                    <p>If the game is over, we stop updating it.</p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                                -- This should go inside the update function
+                                if not self.alive then
+                                    return
+                                end
+                        </code>
+                    </pre>
+
+                    <h4>Displaying the preview</h4>
+
+                    <p>If you remember in the <a href='#next_block_intro'>beginning</a>
+                    I said we need to display a preview of the next piece to the user.
+                    To do that we create an auxiliar grid, and define the next block 
+                    table the same way as we did for the block that was being created.</p>
+
+                    <h4>Displaying the Score</h4>
+
+                    <p>As is commom in most games, we should display the current score
+                        to the user. For that, we create another GUI, a small box with a
+                        simple text <i>Score: 0</i> and update it as the user scores.
+                    </p>
+
+                    <p>But before that, we must define how the scoring system will work. I
+                        decided to give a score based on how many lines were erased at once,
+                        similiar to NES Tetris.
+                    </p>
+
+                    <ul>
+                        <li>If one line was erased, the player recieves 10 points</li>
+                        <li>If two line was erased, the player recieves 25 points</li>
+                        <li>If three line was erased, the player recieves 75 points</li>
+                        <li>If four line was erased, the player recieves 300 points</li>
+                    </ul>
+
+                    <p>Since the longest piece takes four tiles, thats maximum number of lines
+                        that can be erased at once.
+                    </p>
+
+                    <p>To update the GUI text value, we use <a href='https://www.defold.com/manuals/message-passing/'>
+                    Defold's message passing</a></p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            	msg.post("/gui#score", "post_score", { score = self.score })
+                        </code>
+                    </pre>
+
+
+                    <h4>Leveling</h4>
+
+                    <p>Last but not least, theres the levels. The level in which the user is in
+                        defines the speed, which is used to make the tetrominoes move downwards by
+                        itself. As the level increases, so does the speed.
+                    </p>
+
+                    <center><p>The speed is given by: <i>(2  + math.log(self.level))*
+                        2^(self.level/100)</i></p></center>
+
+                    <p>You can modify it as you see fit</p>
+
+                    <p>Each time the user erases 10 lines, the level is increased by one and as the
+                        current speed is a function of the current level, as it increases, so does the
+                        speed.
+                    </p>
+
+                    <p>You can show the user the current level, updating it the same way as it
+                        was done with the score (through Defold's message-passing)
+                    </p>
 
                     <h4>Complete Code</h4>
+
+                    <p>In the complete code there's more implementation, such as the pause screen,
+                        the starting screen, displaying which key is being pressed and some other add-ons,
+                        which are not essential to the game and for that reason are not shown here.
+                    </p>
 
                     <p>The complete code can be found in my <a href="https://github.com/idlerghost/DefoldTetris" target="_blank" 
                         class="icon fa-github">Github page</a></p>
