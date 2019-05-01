@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132349739-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-132349739-1');
+    </script>
+
+    <title>Twitter Sentiment - Idler Ghost</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="images/favicon/manifest.json">
+
+</head>
+
+<body class="is-preload">
+
+    <!-- Page Wrapper -->
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <h1><a href="index.html">Idler Ghost</a></h1>
+            <nav id="nav">
+                <ul>
+                    <li class="special">
+                        <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                        <div id="menu">
+                            <ul>
+                                <!-- Add more pages here as it grows -->
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="python_projectlist.html">Python Projects</a>
+                                    <ul>
+                                        <li><a href="discrete_solver.html">Discrete Solver</a></li>
+                                        <li><a href="twitter_sentiment.html">Twitter Sentiment</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="lua_projectlist.html">Lua Projects</a>
+                                    <ul>
+                                        <li><a href="tetris_lua.html">Tetris</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main -->
+        <article id="main">
+            <header>
+                <h2>Twitter Sentiment</h2>
+                <p>A simple twitter sentiment analisys. This project is still under development</p>
+            </header>
+            <section class="wrapper style5">
+                <div class="inner">
+
+                    <h3>The Project</h3>
+                    <p>
+                        The ideia of the project is to collect data about a subject on twitter and
+                        make analisys based on the sentiment of the tweets collected.
+                    </p>
+
+                    <p>
+                        Most of what I'm doing is based on <a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
+                        Ricky Kim's tutorials<a/>
+                    </p>
+
+                    <p> 
+                        As I progress on this project I plan on updating this website
+                    </p>
+                    
+
+                    <hr />
+
+                    <h4>Collecting the data</h4>
+
+                    <p>
+                        The first step is to collect the data to be analised. As, at the time Avangers: Endgame
+                        is a hot topic, I decided to collect tweets about that. Because of the user agreement, I wont
+                        be making available the data I downloaded. In case you want to skip this step, there are a lot of
+                        datasets for this kinda of analisys.
+                    </p>
+
+                    <p>
+                        As many do, I used tweepy to download the content, and as Rick, I used sqlite to save
+                        the raw data. I'm using <b>wait_on_rate_limit</b> on the API to avoid error code 429,
+                        and <b>try</b>, <b>except</b> to avoid a few others. Error code 503 might still be a problem,
+                        in future versions I might think about a way around that.
+                    </p>
+
+                    <p>
+                        The <b>consumer_key</b>, <b>consumer_secret</b>, <b>acess_token</b> and <b>access_secret</b>
+                        are the ones you recieved after getting your twitter api account.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            # Creates the tweepy api
+                            auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+                            auth.set_access_token(access_token, access_secret)
+                            # wait on rate limit is import to avoid error code 429 from twitter api
+                            api = tweepy.API(auth, wait_on_rate_limit=True)
+
+                            # Creates a sqlite conection
+                            conn = sqlite3.connect('endgame_twt.sqlite')
+                            cur = conn.cursor()
+                            cur.executescript('''
+
+                            CREATE TABLE Endgame (
+                                id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                                user_id TEXT,
+                                user_name TEXT,
+                                user_timezone TEXT,
+                                user_language TEXT,
+                                detected_language TEXT,
+                                tweet_text  TEXT,
+                                tweet_created TEXT
+                            )
+                            ''')
+
+                            # Defines the maximum number of itens to iterate
+                            maxitems = 50000
+                            for tweet in tweepy.Cursor(api.search, q="endgame").items(maxitems):
+                                # The langdetect may throw error if its unable to detect something, 
+                                # so we use try to avoid that
+                                try:
+                                    detected = detect(tweet.text)
+                                    #cur.execute('''INSERT INTO Endgame (
+                                    cur.execute('''INSERT OR IGNORE INTO Endgame (
+                                        user_id, user_name, user_timezone, user_language, detected_language, tweet_text, tweet_created
+                                        ) 
+                                    VALUES ( ?,?,?,?,?,?,? )''', (tweet.user.id,tweet.user.screen_name,tweet.user.time_zone,tweet.user.lang,detected,tweet.text,tweet.created_at))
+                                    conn.commit()
+                                except:
+                                    print("Tweet error")
+                        </code>
+                    </pre>
+
+                    <h4>Cleaning the data</h5>
+
+                    <p>
+                        After getting the data, its important to clean it as there's a lot of stuff
+                        such as emoji's that we want to avoid.
+                    </p>
+
+                    <p>
+                        After the text is cleaned, we use TextBlob to define the sentiment of the tweet, anything with polarity
+                        above zero, we'll be classifying as positive, and the opposite is true for the negative.
+                    </p>
+
+                    <pre>
+                        <code class="wrapper.style5">
+                            emoticons_str = r"""
+                                (?:
+                                    [:=;] # Eyes
+                                    [oO\-]? # Nose (optional)
+                                    [D\)\]\(\]/\\OpP] # Mouth
+                                )"""
+
+                            # Defines the regex list
+                            regex_str = [
+                                r'(?:@[\w_]+)', # @-mentions
+                                r'https?://[^ ]+', # websites
+                                r"(?:\#+[\w_]+[\w\'_\-]*[\w_]+)", # hashtags
+                                r'rt[ ]' # retweets
+                            ]
+
+                            # Combine the regex list
+                            combined_pat = r'|'.join((regex_str))
+                            www_pat = r'www.[^ ]+'
+                            negations_dic = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
+                                            "haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not",
+                                            "wouldn't":"would not", "don't":"do not", "doesn't":"does not","didn't":"did not",
+                                            "can't":"can not","couldn't":"could not","shouldn't":"should not","mightn't":"might not",
+                                            "mustn't":"must not"}
+                            neg_pattern = re.compile(r'\b(' + '|'.join(negations_dic.keys()) + r')\b')
+
+                            #Clean the tweet using beautiful soup and regex
+                            def tweet_cleaner(text):
+                                soup = BeautifulSoup(text, 'lxml')
+                                souped = soup.get_text()
+                                try:
+                                    bom_removed = souped.decode("utf-8-sig").replace(u"\ufffd", "?")
+                                except:
+                                    bom_removed = souped
+                                stripped = re.sub(combined_pat, '', bom_removed)
+                                stripped = re.sub(www_pat, '', stripped)
+                                lower_case = stripped.lower()
+                                neg_handled = neg_pattern.sub(lambda x: negations_dic[x.group()], lower_case)
+                                letters_only = re.sub("[^a-zA-Z]", " ", neg_handled)
+                                # During the letters_only process two lines above, it has created unnecessay white spaces,
+                                # I will tokenize and join together to remove unneccessary white spaces
+                                words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
+                                return (" ".join(words)).strip()
+
+                            # Reads the data saved on the last step
+                            df = pd.read_csv("./endgame.csv",header=0,
+                                            usecols=[7],names=['text'])
+
+                            # Cleans the tweet
+                            print("Cleaning the tweets...\n")
+                            clean_tweet_texts = []
+                            for i in range(0,len(df)):
+                                temp_text = tweet_cleaner(df['text'][i])
+                                temp_text = re.sub(combined_pat, '', temp_text)
+                                clean_tweet_texts.append(temp_text)
+
+                            clean_df = pd.DataFrame(clean_tweet_texts,columns=['text'])
+
+                            clean_df.dropna(inplace=True)
+                            clean_df.reset_index(drop=True,inplace=True)
+                            clean_df.info()
+
+                            # See if the polarity is the same after cleaning the text
+                            for i in range(len(clean_df)):
+                                if TextBlob(clean_df.text[i]).sentiment.polarity > 0:
+                                    sentiment = 1
+                                elif TextBlob(clean_df.text[i]).sentiment.polarity < 0:
+                                    sentiment = 0
+                                else:
+                                    sentiment = 2
+                                clean_df.at[i, 'target'] = sentiment
+
+                            # Saves the cleaned data
+                            clean_df.to_csv('clean_tweet.csv',encoding='utf-8')
+                        </code>
+                    </pre>
+                </div>
+            </section>
+        </article>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <ul class="icons">
+                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span class="label">Github</span></a></li>
+                <!--
+				<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+                <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+				<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+                <li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
+                <li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+				-->
+            </ul>
+            <ul class="copyright">
+                <li>&copy; IdlerGhost</li>
+                <li>Design adapted from: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
+            </ul>
+        </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- Using scripts from HTML5 UP Spectral for the time being -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
