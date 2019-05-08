@@ -294,36 +294,36 @@
 
                     <pre>
                         <code class="wrapper.styl5">
-                                -- Initialize the game (at startup or after game over).
-                                local function reinitialize(self)
-                                
-                                    msg.post(".", "acquire_input_focus")
-                                    msg.post("/gui#gameover", "disable")
-                                
-                                    self.grid = {
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-                                    }
-                                    for x = 1,10 do
-                                        for y = 1,22 do
-                                            tilemap.set_tile("/grid#grid", "game_grid", x, y, 1)
-                                        end
-                                    end
-                                
-                                    math.randomseed(os.time())
-                                    math.random(); math.random(); math.random()  -- make it more random
-                                
-                                    create_block(self)
-                                
-                                end
+-- Initialize the game (at startup or after game over).
+local function reinitialize(self)
+
+    msg.post(".", "acquire_input_focus")
+    msg.post("/gui#gameover", "disable")
+
+    self.grid = {
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+    }
+    for x = 1,10 do
+        for y = 1,22 do
+            tilemap.set_tile("/grid#grid", "game_grid", x, y, 1)
+        end
+    end
+
+    math.randomseed(os.time())
+    math.random(); math.random(); math.random()  -- make it more random
+
+    create_block(self)
+
+end
                         </code>
                     </pre>
 
@@ -355,85 +355,85 @@
                     
                     <pre>
                         <code class="wrapper.style5">
-                            	self.block = {}
-                                if self.next_block == nil then
-                                    self.block.number = math.random(2, 8)
-                                else
-                                    self.block.number = self.next_block
-                                end
+self.block = {}
+if self.next_block == nil then
+    self.block.number = math.random(2, 8)
+else
+    self.block.number = self.next_block
+end
 
-                                if self.block.number == 2 then
-                                    -- OOOO
-                                    self.block.coords = {
-                                        { x = 4, y = 22 },
-                                        { x = 5, y = 22 },
-                                        { x = 6, y = 22 },
-                                        { x = 7, y = 22 }
-                                    }
+if self.block.number == 2 then
+    -- OOOO
+    self.block.coords = {
+        { x = 4, y = 22 },
+        { x = 5, y = 22 },
+        { x = 6, y = 22 },
+        { x = 7, y = 22 }
+    }
 
-                                elseif self.block.number == 3 then
-                                    -- OO
-                                    -- OO
-                                    self.block.coords = {
-                                        { x = 5, y = 22 },
-                                        { x = 6, y = 22 },
-                                        { x = 5, y = 21 },
-                                        { x = 6, y = 21 }
-                                    }
+elseif self.block.number == 3 then
+    -- OO
+    -- OO
+    self.block.coords = {
+        { x = 5, y = 22 },
+        { x = 6, y = 22 },
+        { x = 5, y = 21 },
+        { x = 6, y = 21 }
+    }
 
-                                elseif self.block.number == 4 then
-                                    -- OOO
-                                    --  O
-                                    self.block.coords = {
-                                        { x = 5, y = 22 },
-                                        { x = 6, y = 22 },
-                                        { x = 7, y = 22 },
-                                        { x = 6, y = 21 }
-                                    }
+elseif self.block.number == 4 then
+    -- OOO
+    --  O
+    self.block.coords = {
+        { x = 5, y = 22 },
+        { x = 6, y = 22 },
+        { x = 7, y = 22 },
+        { x = 6, y = 21 }
+    }
 
-                                elseif self.block.number == 5 then
-                                    --  OO
-                                    -- OO
-                                    self.block.coords = {
-                                        { x = 6, y = 22 },
-                                        { x = 7, y = 22 },
-                                        { x = 5, y = 21 },
-                                        { x = 6, y = 21 }
-                                    }
+elseif self.block.number == 5 then
+    --  OO
+    -- OO
+    self.block.coords = {
+        { x = 6, y = 22 },
+        { x = 7, y = 22 },
+        { x = 5, y = 21 },
+        { x = 6, y = 21 }
+    }
 
-                                elseif self.block.number == 6 then
-                                    -- OO
-                                    --  OO
-                                    self.block.coords = {
-                                        { x = 5, y = 22 },
-                                        { x = 6, y = 22 },
-                                        { x = 6, y = 21 },
-                                        { x = 7, y = 21 }
-                                    }
+elseif self.block.number == 6 then
+    -- OO
+    --  OO
+    self.block.coords = {
+        { x = 5, y = 22 },
+        { x = 6, y = 22 },
+        { x = 6, y = 21 },
+        { x = 7, y = 21 }
+    }
 
-                                elseif self.block.number == 7 then
-                                    -- O
-                                    -- OOO
-                                    self.block.coords = {
-                                        { x = 5, y = 22 },
-                                        { x = 5, y = 21 },
-                                        { x = 6, y = 21 },
-                                        { x = 7, y = 21 }
-                                    }
+elseif self.block.number == 7 then
+    -- O
+    -- OOO
+    self.block.coords = {
+        { x = 5, y = 22 },
+        { x = 5, y = 21 },
+        { x = 6, y = 21 },
+        { x = 7, y = 21 }
+    }
 
-                                elseif self.block.number == 8 then
-                                    --   O
-                                    -- OOO
-                                    self.block.coords = {
-                                        { x = 7, y = 22 },
-                                        { x = 5, y = 21 },
-                                        { x = 6, y = 21 },
-                                        { x = 7, y = 21 }
-                                    }
+elseif self.block.number == 8 then
+    --   O
+    -- OOO
+    self.block.coords = {
+        { x = 7, y = 22 },
+        { x = 5, y = 21 },
+        { x = 6, y = 21 },
+        { x = 7, y = 21 }
+    }
 
-                                end
+end
 
-                            self.next_block = math.random(2, 8)
+self.next_block = math.random(2, 8)
                         </code>
                     </pre>
 
@@ -449,11 +449,11 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            for i,v in ipairs(self.block.coords) do
-                                if v.y < 22 then
-                                    tilemap.set_tile("/grid#grid", "game_grid", v.x, v.y + 1, self.block.number)
-                                end
-                            end
+for i,v in ipairs(self.block.coords) do
+    if v.y < 22 then
+        tilemap.set_tile("/grid#grid", "game_grid", v.x, v.y + 1, self.block.number)
+    end
+end
                         </code>
                     </pre>
 
@@ -468,33 +468,33 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            local function rotate(self)
-                                if self.block.number == 3 then  -- O block
-                                    return true
-                                end
-                                local nextcoords = {}
-                                local center = nil
-                                if self.block.number == 2 or self.block.number == 4 or self.block.number == 6 then
-                                    center = self.block.coords[2]
-                                elseif self.block.number == 5 then
-                                    center = self.block.coords[1]
-                                elseif self.block.number == 7 or self.block.number == 8 then
-                                    center = self.block.coords[3]
-                                end
-                            
-                                for i,v in ipairs(self.block.coords) do
-                                    local point = { x = center.x + center.y - v.y, y = center.y + v.x - center.x }
-                                    if point.x < 1 or point.x > 10 or point.y < 1 or point.y > 24 then
-                                        return false
-                                    end
-                                    if self.grid[point.x][point.y] ~= 1 then
-                                        return false
-                                    end
-                                    table.insert(nextcoords, point)
-                                end
-                                repaint(self.block, nextcoords)
-                                return true
-                            end
+local function rotate(self)
+    if self.block.number == 3 then  -- O block
+        return true
+    end
+    local nextcoords = {}
+    local center = nil
+    if self.block.number == 2 or self.block.number == 4 or self.block.number == 6 then
+        center = self.block.coords[2]
+    elseif self.block.number == 5 then
+        center = self.block.coords[1]
+    elseif self.block.number == 7 or self.block.number == 8 then
+        center = self.block.coords[3]
+    end
+
+    for i,v in ipairs(self.block.coords) do
+        local point = { x = center.x + center.y - v.y, y = center.y + v.x - center.x }
+        if point.x < 1 or point.x > 10 or point.y < 1 or point.y > 24 then
+            return false
+        end
+        if self.grid[point.x][point.y] ~= 1 then
+            return false
+        end
+        table.insert(nextcoords, point)
+    end
+    repaint(self.block, nextcoords)
+    return true
+end
                         </code>
                     </pre>
 
@@ -526,25 +526,25 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            local function move_down(self)
-                                local nextcoords = {}
-                                for i,v in ipairs(self.block.coords) do
-                                    if v.y == 1 then
-                                        -- Reached floor.
-                                        next_block(self)
-                                        return false
-                                    end
-                                    local number = self.grid[v.x][v.y - 1]
-                                    if number ~= 1 then
-                                        -- Reached an existing block.
-                                        next_block(self)
-                                        return false
-                                    end
-                                    table.insert(nextcoords, { x = v.x, y = v.y - 1 })
-                                end
-                                repaint(self.block, nextcoords)
-                                return true
-                            end
+local function move_down(self)
+    local nextcoords = {}
+    for i,v in ipairs(self.block.coords) do
+        if v.y == 1 then
+            -- Reached floor.
+            next_block(self)
+            return false
+        end
+        local number = self.grid[v.x][v.y - 1]
+        if number ~= 1 then
+            -- Reached an existing block.
+            next_block(self)
+            return false
+        end
+        table.insert(nextcoords, { x = v.x, y = v.y - 1 })
+    end
+    repaint(self.block, nextcoords)
+    return true
+end
                         </code>
                     </pre>
 
@@ -560,46 +560,46 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                                function on_input(self, action_id, action)
+function on_input(self, action_id, action)
 
-                                if action_id == hash("up") and (action.pressed or action.repeated) then	
-                                    rotate(self)
+    if action_id == hash("up") and (action.pressed or action.repeated) then	
+        rotate(self)
 
-                                elseif action_id == hash("down") and (action.pressed or action.repeated) then
-                                    move_down(self)
-                            
-                                elseif action_id == hash("left") and (action.pressed or action.repeated) then
-                                    local nextcoords = {}
-                                    for i,v in ipairs(self.block.coords) do
-                                        if v.x == 1 then
-                                            return
-                                        end
-                                        if self.grid[v.x - 1][v.y] ~= 1 then
-                                            return
-                                        end
-                                        table.insert(nextcoords, { x = v.x - 1, y = v.y } )
-                                    end
-                                    repaint(self.block, nextcoords)
+    elseif action_id == hash("down") and (action.pressed or action.repeated) then
+        move_down(self)
 
-                                elseif action_id == hash("right") and (action.pressed or action.repeated) then
-                                    local nextcoords = {}
-                                    for i,v in ipairs(self.block.coords) do
-                                        if v.x == 10 then
-                                            return
-                                        end
-                                        if self.grid[v.x + 1][v.y] ~= 1 then
-                                            return
-                                        end
-                                        table.insert(nextcoords, { x = v.x + 1, y = v.y } )
-                                    end
-                                    repaint(self.block, nextcoords)
-                            
-                                elseif action_id == hash("space") and action.pressed then
-                                    while move_down(self) do
-                                    end
-                            
-                                end
-                            end
+    elseif action_id == hash("left") and (action.pressed or action.repeated) then
+        local nextcoords = {}
+        for i,v in ipairs(self.block.coords) do
+            if v.x == 1 then
+                return
+            end
+            if self.grid[v.x - 1][v.y] ~= 1 then
+                return
+            end
+            table.insert(nextcoords, { x = v.x - 1, y = v.y } )
+        end
+        repaint(self.block, nextcoords)
+
+    elseif action_id == hash("right") and (action.pressed or action.repeated) then
+        local nextcoords = {}
+        for i,v in ipairs(self.block.coords) do
+            if v.x == 10 then
+                return
+            end
+            if self.grid[v.x + 1][v.y] ~= 1 then
+                return
+            end
+            table.insert(nextcoords, { x = v.x + 1, y = v.y } )
+        end
+        repaint(self.block, nextcoords)
+
+    elseif action_id == hash("space") and action.pressed then
+        while move_down(self) do
+        end
+
+    end
+end
                         </code>
                     </pre>
 
@@ -608,13 +608,13 @@
                     
                     <pre>
                         <code class="wrapper.style5">
-                            function update(self, dt)
-                                self.t = self.t + dt
-                                if self.t > 1 / self.speed then
-                                    move_down(self)
-                                    self.t = 0
-                                end
-                            end
+function update(self, dt)
+    self.t = self.t + dt
+    if self.t > 1 / self.speed then
+        move_down(self)
+        self.t = 0
+    end
+end
                         </code>
                     </pre>
 
@@ -628,33 +628,33 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            local function check_lines(self)
-                                --Check every line 
-                                for y = 1,22 do
-                                    linecomplete = true
-                                    for x = 1,10 do
-                                        if self.grid[x][y] == 1 then
-                                            linecomplete = false
-                                        end
-                                    end
+local function check_lines(self)
+    --Check every line 
+    for y = 1,22 do
+        linecomplete = true
+        for x = 1,10 do
+            if self.grid[x][y] == 1 then
+                linecomplete = false
+            end
+        end
 
-                                    --If a line was completed, rearrange
-                                    if linecomplete then
-                                        for yy = y + 1, 22 do
-                                            for x = 1,10 do
-                                                self.grid[x][yy - 1] = self.grid[x][yy]
-                                                tilemap.set_tile("/grid#grid", "game_grid", x, yy - 1, self.grid[x][yy])
-                                            end
-                                        end
-                                        for x = 1,10 do
-                                            self.grid[x][22] = 1
-                                            tilemap.set_tile("/grid#grid", "game_grid", x, 22, 1)
-                                        end
-                                        return true
-                                    end
-                                end
-                                return false
-                            end
+        --If a line was completed, rearrange
+        if linecomplete then
+            for yy = y + 1, 22 do
+                for x = 1,10 do
+                    self.grid[x][yy - 1] = self.grid[x][yy]
+                    tilemap.set_tile("/grid#grid", "game_grid", x, yy - 1, self.grid[x][yy])
+                end
+            end
+            for x = 1,10 do
+                self.grid[x][22] = 1
+                tilemap.set_tile("/grid#grid", "game_grid", x, 22, 1)
+            end
+            return true
+        end
+    end
+    return false
+end
                         </code>
                     </pre>
 
@@ -677,12 +677,12 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            	for i,v in ipairs(self.block.coords) do
-                                    if self.grid[v.x][v.y] ~= 1 then
-                                        self.alive = false
-                                        msg.post("/gui#gameover", "enable")
-                                    end
-                                end
+for i,v in ipairs(self.block.coords) do
+    if self.grid[v.x][v.y] ~= 1 then
+        self.alive = false
+        msg.post("/gui#gameover", "enable")
+    end
+end
                         </code>
                     </pre>
 
@@ -690,13 +690,13 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                                -- This should go inside the on_input function
-                                if not self.alive then
-                                    if action_id == hash("space") then
-                                        reinitialize(self)
-                                    end
-                                    return
-                                end
+-- This should go inside the on_input function
+if not self.alive then
+    if action_id == hash("space") then
+        reinitialize(self)
+    end
+    return
+end
                         </code>
                     </pre>
 
@@ -704,10 +704,10 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                                -- This should go inside the update function
-                                if not self.alive then
-                                    return
-                                end
+-- This should go inside the update function
+if not self.alive then
+    return
+end
                         </code>
                     </pre>
 
@@ -746,7 +746,7 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            	msg.post("/gui#score", "post_score", { score = self.score })
+msg.post("/gui#score", "post_score", { score = self.score })
                         </code>
                     </pre>
 

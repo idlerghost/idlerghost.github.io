@@ -19,7 +19,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png">
@@ -31,7 +32,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
@@ -84,175 +85,245 @@
 
                     <h3>The Project</h3>
                     <p>
-                        The ideia of the project is to collect data about a subject on twitter and
-                        make analisys based on the sentiment of the tweets collected.
+                        The ideia of the project is to collect data about a subject on twitter and make analisys based on the sentiment of the tweets collected.
                     </p>
 
                     <p>
                         Most of what I'm doing is based on <a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
-                        Ricky Kim's tutorials<a/>
+                            Ricky Kim's tutorials<a />
                     </p>
 
-                    <p> 
-                        As I progress on this project I plan on updating this website
-                    </p>
-                    
-
-                    <hr />
-
-                    <h4>Collecting the data</h4>
-
-                    <p>
-                        The first step is to collect the data to be analised. As, at the time Avangers: Endgame
-                        is a hot topic, I decided to collect tweets about that. Because of the user agreement, I wont
-                        be making available the data I downloaded. In case you want to skip this step, there are a lot of
-                        datasets for this kinda of analisys.
+                    <p id='list_topics'>
+                        As the text is really long the following hyperlinks may be of help:
                     </p>
 
-                    <p>
-                        As many do, I used tweepy to download the content, and as Rick, I used sqlite to save
-                        the raw data. I'm using <b>wait_on_rate_limit</b> on the API to avoid error code 429,
-                        and <b>try</b>, <b>except</b> to avoid a few others. Error code 503 might still be a problem,
-                        in future versions I might think about a way around that.
-                    </p>
+                    <ul>
+                        <li><a href='#collectData'>Collecting data</a> - Introduction on how to collect the data on twitter</li>
+                        <li><a href='#cleanData'>Cleaning the data</a> - Introduction on how to clean the collect data for further analisys</li>
+                        <li><a href='#wordCloud'>Word Cloud</a> - Implementation of a word cloud to the cleaned data</li>
+                        <li><a href='#termFreq'>Terms Frequency</a> - Introduction on how to check the frequency of terms used</li>
+                        </ul>
 
-                    <p>
-                        The <b>consumer_key</b>, <b>consumer_secret</b>, <b>acess_token</b> and <b>access_secret</b>
-                        are the ones you recieved after getting your twitter api account.
-                    </p>
+                        <p>
+                            As I progress on this project I plan on updating this website
+                        </p>
 
-                    <pre>
+
+                        <hr />
+
+                        <h4 id='collectData'>Collecting data</h4>
+
+                        <p>
+                            The first step is to collect the data to be analised. As, at the time Avangers: Endgame is a hot topic, I decided to collect tweets about that. Because of the user agreement, I wont be making available the data I downloaded. In case you want to skip this
+                            step, there are a lot of datasets for this kinda of analisys.
+                        </p>
+
+                        <p>
+                            As many do, I used tweepy to download the content, and as Rick, I used sqlite to save the raw data. I'm using <b>wait_on_rate_limit</b> on the API to avoid error code 429, and <b>try</b>,
+                            <b>except</b> to avoid a few others. Error code 503 might still be a problem, in future versions I might think about a way around that.
+                        </p>
+
+                        <p>
+                            The <b>consumer_key</b>, <b>consumer_secret</b>, <b>acess_token</b> and <b>access_secret</b> are the ones you recieved after getting your twitter api account.
+                        </p>
+
+                        <pre>
                         <code class="wrapper.style5">
-                            # Creates the tweepy api
-                            auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-                            auth.set_access_token(access_token, access_secret)
-                            # wait on rate limit is import to avoid error code 429 from twitter api
-                            api = tweepy.API(auth, wait_on_rate_limit=True)
+# Creates the tweepy api
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+# wait on rate limit is import to avoid error code 429 from twitter api
+api = tweepy.API(auth, wait_on_rate_limit=True)
 
-                            # Creates a sqlite conection
-                            conn = sqlite3.connect('endgame_twt.sqlite')
-                            cur = conn.cursor()
-                            cur.executescript('''
+# Creates a sqlite conection
+conn = sqlite3.connect('endgame_twt.sqlite')
+cur = conn.cursor()
+cur.executescript('''
 
-                            CREATE TABLE Endgame (
-                                id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                                user_id TEXT,
-                                user_name TEXT,
-                                user_timezone TEXT,
-                                user_language TEXT,
-                                detected_language TEXT,
-                                tweet_text  TEXT,
-                                tweet_created TEXT
-                            )
-                            ''')
+CREATE TABLE Endgame (
+    id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    user_id TEXT,
+    user_name TEXT,
+    user_timezone TEXT,
+    user_language TEXT,
+    detected_language TEXT,
+    tweet_text  TEXT,
+    tweet_created TEXT
+)
+''')
 
-                            # Defines the maximum number of itens to iterate
-                            maxitems = 50000
-                            for tweet in tweepy.Cursor(api.search, q="endgame").items(maxitems):
-                                # The langdetect may throw error if its unable to detect something, 
-                                # so we use try to avoid that
-                                try:
-                                    detected = detect(tweet.text)
-                                    #cur.execute('''INSERT INTO Endgame (
-                                    cur.execute('''INSERT OR IGNORE INTO Endgame (
-                                        user_id, user_name, user_timezone, user_language, detected_language, tweet_text, tweet_created
-                                        ) 
-                                    VALUES ( ?,?,?,?,?,?,? )''', (tweet.user.id,tweet.user.screen_name,tweet.user.time_zone,tweet.user.lang,detected,tweet.text,tweet.created_at))
-                                    conn.commit()
-                                except:
-                                    print("Tweet error")
+# Defines the maximum number of itens to iterate
+maxitems = 50000
+for tweet in tweepy.Cursor(api.search, q="endgame").items(maxitems):
+    # The langdetect may throw error if its unable to detect something, 
+    # so we use try to avoid that
+    try:
+        detected = detect(tweet.text)
+        #cur.execute('''INSERT INTO Endgame (
+        cur.execute('''INSERT OR IGNORE INTO Endgame (
+            user_id, user_name, user_timezone, user_language, detected_language, tweet_text, tweet_created
+            ) 
+        VALUES ( ?,?,?,?,?,?,? )''', (tweet.user.id,tweet.user.screen_name,tweet.user.time_zone,tweet.user.lang,detected,tweet.text,tweet.created_at))
+        conn.commit()
+    except:
+        print("Tweet error")
                         </code>
                     </pre>
 
-                    <h4>Cleaning the data</h5>
+                        <p>
+                            <a href='#list_topics'> Go back to the topics list</a>
+                        </p>
 
-                    <p>
-                        After getting the data, its important to clean it as there's a lot of stuff
-                        such as emoji's that we want to avoid.
-                    </p>
+                        <h4 id='cleanData'>Cleaning the data</h5>
 
-                    <p>
-                        After the text is cleaned, we use TextBlob to define the sentiment of the tweet, anything with polarity
-                        above zero, we'll be classifying as positive, and the opposite is true for the negative.
-                    </p>
+                            <p>
+                                After getting the data, its important to clean it as there's a lot of stuff such as emoji's that we want to avoid. We'll be using regular expressions for that, so the first thing is to define a list with expressions that should be removed, like websites,
+                                mentions and hashtags.
+                            </p>
 
-                    <pre>
+                            <p>
+                                After the text is cleaned, we use TextBlob to define the sentiment of the tweet, anything with polarity above zero we'll be classifying as positive, and the opposite is true for the negative.
+                            </p>
+
+                            <pre>
                         <code class="wrapper.style5">
-                            emoticons_str = r"""
-                                (?:
-                                    [:=;] # Eyes
-                                    [oO\-]? # Nose (optional)
-                                    [D\)\]\(\]/\\OpP] # Mouth
-                                )"""
+emoticons_str = r"""
+    (?:
+        [:=;] # Eyes
+        [oO\-]? # Nose (optional)
+        [D\)\]\(\]/\\OpP] # Mouth
+    )"""
 
-                            # Defines the regex list
-                            regex_str = [
-                                r'(?:@[\w_]+)', # @-mentions
-                                r'https?://[^ ]+', # websites
-                                r"(?:\#+[\w_]+[\w\'_\-]*[\w_]+)", # hashtags
-                                r'rt[ ]' # retweets
-                            ]
+# Defines the regex list
+regex_str = [
+    r'(?:@[\w_]+)', # @-mentions
+    r'https?://[^ ]+', # websites
+    r"(?:\#+[\w_]+[\w\'_\-]*[\w_]+)", # hashtags
+    r'rt[ ]' # retweets
+]
 
-                            # Combine the regex list
-                            combined_pat = r'|'.join((regex_str))
-                            www_pat = r'www.[^ ]+'
-                            negations_dic = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
-                                            "haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not",
-                                            "wouldn't":"would not", "don't":"do not", "doesn't":"does not","didn't":"did not",
-                                            "can't":"can not","couldn't":"could not","shouldn't":"should not","mightn't":"might not",
-                                            "mustn't":"must not"}
-                            neg_pattern = re.compile(r'\b(' + '|'.join(negations_dic.keys()) + r')\b')
+# Combine the regex list
+combined_pat = r'|'.join((regex_str))
+www_pat = r'www.[^ ]+'
+negations_dic = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
+                "haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not",
+                "wouldn't":"would not", "don't":"do not", "doesn't":"does not","didn't":"did not",
+                "can't":"can not","couldn't":"could not","shouldn't":"should not","mightn't":"might not",
+                "mustn't":"must not"}
+neg_pattern = re.compile(r'\b(' + '|'.join(negations_dic.keys()) + r')\b')
 
-                            #Clean the tweet using beautiful soup and regex
-                            def tweet_cleaner(text):
-                                soup = BeautifulSoup(text, 'lxml')
-                                souped = soup.get_text()
-                                try:
-                                    bom_removed = souped.decode("utf-8-sig").replace(u"\ufffd", "?")
-                                except:
-                                    bom_removed = souped
-                                stripped = re.sub(combined_pat, '', bom_removed)
-                                stripped = re.sub(www_pat, '', stripped)
-                                lower_case = stripped.lower()
-                                neg_handled = neg_pattern.sub(lambda x: negations_dic[x.group()], lower_case)
-                                letters_only = re.sub("[^a-zA-Z]", " ", neg_handled)
-                                # During the letters_only process two lines above, it has created unnecessay white spaces,
-                                # I will tokenize and join together to remove unneccessary white spaces
-                                words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
-                                return (" ".join(words)).strip()
+#Clean the tweet using beautiful soup and regex
+def tweet_cleaner(text):
+    soup = BeautifulSoup(text, 'lxml')
+    souped = soup.get_text()
+    try:
+        bom_removed = souped.decode("utf-8-sig").replace(u"\ufffd", "?")
+    except:
+        bom_removed = souped
+    stripped = re.sub(combined_pat, '', bom_removed)
+    stripped = re.sub(www_pat, '', stripped)
+    lower_case = stripped.lower()
+    neg_handled = neg_pattern.sub(lambda x: negations_dic[x.group()], lower_case)
+    letters_only = re.sub("[^a-zA-Z]", " ", neg_handled)
+    # During the letters_only process two lines above, it has created unnecessay white spaces,
+    # I will tokenize and join together to remove unneccessary white spaces
+    words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
+    return (" ".join(words)).strip()
 
-                            # Reads the data saved on the last step
-                            df = pd.read_csv("./endgame.csv",header=0,
-                                            usecols=[7],names=['text'])
+# Reads the data saved on the last step
+df = pd.read_csv("./endgame.csv",header=0,
+                usecols=[7],names=['text'])
 
-                            # Cleans the tweet
-                            print("Cleaning the tweets...\n")
-                            clean_tweet_texts = []
-                            for i in range(0,len(df)):
-                                temp_text = tweet_cleaner(df['text'][i])
-                                temp_text = re.sub(combined_pat, '', temp_text)
-                                clean_tweet_texts.append(temp_text)
+# Cleans the tweet
+print("Cleaning the tweets...\n")
+clean_tweet_texts = []
+for i in range(0,len(df)):
+    temp_text = tweet_cleaner(df['text'][i])
+    temp_text = re.sub(combined_pat, '', temp_text)
+    clean_tweet_texts.append(temp_text)
 
-                            clean_df = pd.DataFrame(clean_tweet_texts,columns=['text'])
+clean_df = pd.DataFrame(clean_tweet_texts,columns=['text'])
 
-                            clean_df.dropna(inplace=True)
-                            clean_df.reset_index(drop=True,inplace=True)
-                            clean_df.info()
+clean_df.dropna(inplace=True)
+clean_df.reset_index(drop=True,inplace=True)
+clean_df.info()
 
-                            # See if the polarity is the same after cleaning the text
-                            for i in range(len(clean_df)):
-                                if TextBlob(clean_df.text[i]).sentiment.polarity > 0:
-                                    sentiment = 1
-                                elif TextBlob(clean_df.text[i]).sentiment.polarity < 0:
-                                    sentiment = 0
-                                else:
-                                    sentiment = 2
-                                clean_df.at[i, 'target'] = sentiment
-
-                            # Saves the cleaned data
-                            clean_df.to_csv('clean_tweet.csv',encoding='utf-8')
+# See if the polarity is the same after cleaning the text
+for i in range(len(clean_df)):
+    if TextBlob(clean_df.text[i]).sentiment.polarity > 0:
+        sentiment = 1
+    elif TextBlob(clean_df.text[i]).sentiment.polarity < 0:
+        sentiment = 0
+    else:
+        sentiment = 2
+    clean_df.at[i, 'target'] = sentiment
                         </code>
                     </pre>
+
+                            <p>
+                                <a href='#list_topics'> Go back to the topics list</a>
+                            </p>
+
+                            <h4 id='wordCloud'>Word Cloud</h4>
+
+                            <p>
+                                After cleaning the data, we'll start analising it. The first cool thing we can do is a word cloud. It looks kinda cool and it is also a nice way to see the most frequently used words
+                            </p>
+
+                            <p>
+                                To make the cloud, we'll be using <b>pyplot</b> to plot the data and <b>NLTK</b>
+                                <b>tokenize</b> to extract the tokens
+                            </p>
+
+                            <pre>
+                        <code>
+
+# Filter the positive tweets
+pos_tweet = clean_data[clean_data.target == 1]
+pos_string = []
+for t in pos_tweet.text:
+    pos_string.append(t)
+
+pos_string = pd.Series(pos_string).str.cat(sep=' ')
+
+# Makes a word cloud using the positive tweets
+wordcloud = WordCloud(width=1600, height=800,max_font_size=200, colormap='spring').generate(pos_string)
+plt.figure(figsize=(12,10))
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+#To save figure
+#plt.savefigure(fname = 'positive_wordcloud.png')
+
+# Filter the negative tweets
+neg_tweets = clean_data[clean_data.target == 0]
+neg_string = []
+for t in neg_tweets.text:
+    neg_string.append(t)
+    
+neg_string = pd.Series(neg_string).str.cat(sep=' ')
+
+# Makes a word cloud using the negative tweets
+wordcloud = WordCloud(width=1600, height=800,max_font_size=200, colormap='winter').generate(neg_string)
+plt.figure(figsize=(12,10))
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+#To save figure
+#plt.savefigure(fname = 'negative_wordcloud.png')
+
+
+                        </code>
+                    </pre>
+
+                            <p>
+                                <a href='#list_topics'> Go back to the topics list</a>
+                            </p>
+
+                            <h4 id='termFreq'>Terms Frequency</h4>
+
+                            <p></p>
+
                 </div>
             </section>
         </article>
@@ -260,7 +331,8 @@
         <!-- Footer -->
         <footer id="footer">
             <ul class="icons">
-                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span class="label">Github</span></a></li>
+                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span
+                            class="label">Github</span></a></li>
                 <!--
 				<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
                 <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>

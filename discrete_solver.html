@@ -19,7 +19,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png">
@@ -31,7 +32,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
@@ -84,7 +85,7 @@
 
                     <h3>The Project</h3>
                     <p>
-                        The idea of a system that is able to improve itself is 
+                        The idea of a system that is able to improve itself is
                         something that has long captured my attention. Then a few months
                         back I came started to learn about Machine Learning.
                     </p>
@@ -94,25 +95,25 @@
                         like this one. For that reason I decided to share my first project
                         in the area.
                     </p>
-                    
+
                     <p>
                         The ideia of this project is to try solving as many discrete time
-                        environment as possible in  <a href ="https://gym.openai.com/">Gym</a>
+                        environment as possible in <a href="https://gym.openai.com/">Gym</a>
                         without making changes specifics to treat some of the
                         environment characteristics through the use of Deep Learning.
                     </p>
 
                     <p>
-                        For that purpose, I choose to try using a Doble DQN network 
-                        implemented in <a href ="https://keras.io/">Keras</a> 
-                        using <a href = "https://www.tensorflow.org/">TensorFlow</a> 
+                        For that purpose, I choose to try using a Doble DQN network
+                        implemented in <a href="https://keras.io/">Keras</a>
+                        using <a href="https://www.tensorflow.org/">TensorFlow</a>
                         as backend.
                     </p>
 
                     <p>
                         Below I'll share my journey and results so far.
                     </p>
-                
+
                     <p>
                         Fistly, I'll start with a small introduction to the concepts
                         involved in this project. If you find yourself familiar with these
@@ -124,18 +125,18 @@
                     <h4>RL</h4>
 
                     <p>
-                        Reinforcement Learning is an autonomous self-learning system 
-                        that assimilates information by trial and error. The actions are 
-                        performed with the objective of maximizing the rewards obtained, 
+                        Reinforcement Learning is an autonomous self-learning system
+                        that assimilates information by trial and error. The actions are
+                        performed with the objective of maximizing the rewards obtained,
                         that is, learning in practice to obtain the best results.
                     </p>
 
                     <p>
-                        Its operation is similar to the way people, for the most part, 
-                        learn to ride a bicycle. At first they fall frequently and make 
-                        erratic movements with a certain frequency, but over time, through 
-                        the process of trial and error, they understand which movements 
-                        brings positive results and which have presented negative ones 
+                        Its operation is similar to the way people, for the most part,
+                        learn to ride a bicycle. At first they fall frequently and make
+                        erratic movements with a certain frequency, but over time, through
+                        the process of trial and error, they understand which movements
+                        brings positive results and which have presented negative ones
                         and use these perceptions to adjust their performance.
                     </p>
 
@@ -146,72 +147,71 @@
 
                     <ul>
                         <li><a href="http://reinforcementlearning.ai-depot.com/">
-                        RL Warehouse</a></li>
+                                RL Warehouse</a></li>
                         <li><a href="https://towardsdatascience.com/reinforcement-learning-with-python-8ef0242a2fa2">
-                        Towards Data Science</a></li>
+                                Towards Data Science</a></li>
                         <li><a href="https://blog.algorithmia.com/introduction-to-reinforcement-learning/">
-                        Algorithmia</a></li>
+                                Algorithmia</a></li>
                     </ul>
 
                     <h4>DQN</h4>
 
                     <p>
-                            DQN is a RL technique that is aimed at choosing the best 
-                            action for given circumstances (states). Each possible action 
-                            for each possible observation has its Q value, 
-                            where ‘Q’ stands for a quality of a given move.
+                        DQN is a RL technique that is aimed at choosing the best
+                        action for given circumstances (states). Each possible action
+                        for each possible observation has its Q value,
+                        where ‘Q’ stands for a quality of a given move.
                     </p>
 
                     <figure>
-                            <img src="images/discrete_solver/simple_RL_schema.png" 
-                            alt="Simple RL Operating Scheme">
-                            <figcaption>RL Operating Scheme</figcaption>
+                        <img src="images/discrete_solver/simple_RL_schema.png" alt="Simple RL Operating Scheme">
+                        <figcaption>RL Operating Scheme</figcaption>
                     </figure>
-                    
+
                     <br>
 
                     <h4>Double DQN</h4>
 
                     <p>
-                        Deep Q-learning is known to sometimes learn unrealistically high 
-                        action values because it includes a maximization step over 
-                        estimated action values, which tends to prefer overestimated to 
+                        Deep Q-learning is known to sometimes learn unrealistically high
+                        action values because it includes a maximization step over
+                        estimated action values, which tends to prefer overestimated to
                         underestimated values.
                     </p>
 
                     <p>
-                        The idea of Double Q-learning is to reduce overestimations by 
-                        decomposing the max operation in the target into action selection 
-                        and action evaluation. In the vanilla implementation, the action 
+                        The idea of Double Q-learning is to reduce overestimations by
+                        decomposing the max operation in the target into action selection
+                        and action evaluation. In the vanilla implementation, the action
                         selection and action evaluation are coupled.
                     </p>
 
                     <p>
-                        Let's take an example for the DQN where the true return value is 0 
-                        for all actions of the current state. However, due to noise in 
-                        the estimation, some actions can, for example, get a small positive 
-                        values and other actions can get a small negative values 
-                        (say 0.05 -0.05). In the return estimation of the Q function, 
-                        the function is evaluated for all possible actions in this state 
-                        and then an action with a higher Q value is chosen. However, 
-                        because of the noise, the maximum will be a small positive value 
-                        (0.05), not zero, and this will continue to happen. This makes 
+                        Let's take an example for the DQN where the true return value is 0
+                        for all actions of the current state. However, due to noise in
+                        the estimation, some actions can, for example, get a small positive
+                        values and other actions can get a small negative values
+                        (say 0.05 -0.05). In the return estimation of the Q function,
+                        the function is evaluated for all possible actions in this state
+                        and then an action with a higher Q value is chosen. However,
+                        because of the noise, the maximum will be a small positive value
+                        (0.05), not zero, and this will continue to happen. This makes
                         the estimation of a simple Q-learning algorithm biased.
                     </p>
 
                     <p>
-                        However, by adding another noisy Q2 function instead of Q to 
-                        select the best action, then in case of noise positive or negative 
-                        values can be obtained (assuming that Q2 produces noises other 
-                        than Q), then, on average, the value will be closer to 0 and the 
+                        However, by adding another noisy Q2 function instead of Q to
+                        select the best action, then in case of noise positive or negative
+                        values can be obtained (assuming that Q2 produces noises other
+                        than Q), then, on average, the value will be closer to 0 and the
                         estimate becomes more unbiased.
                     </p>
 
                     <h5>Amsgrad</h5>
 
                     <p>
-                        Adam can fail to converge to the optimal solution even in simple 
-                        and one-dimensional convex configurations. To try avoiding that, and 
+                        Adam can fail to converge to the optimal solution even in simple
+                        and one-dimensional convex configurations. To try avoiding that, and
                         also, given the performance improvement seen through its implementation,
                         Amsgrad was implemented through <a href="https://keras.io/">Keras</a>.
                     </p>
@@ -222,24 +222,24 @@
                         The RL agent can learn more effectively from some transitions of the
                         memory than others, so, we try to prioritize these transitions.
                     </p>
-                    
-                    <h4 id ='hyper_par'>Hyperparameters</h4>
+
+                    <h4 id='hyper_par'>Hyperparameters</h4>
 
                     <p>
-                        There are some parameters that are external to the model and whose value 
+                        There are some parameters that are external to the model and whose value
                         cannot be estimated from data. These must be defined by the user.
                     </p>
 
                     <ul>
                         <li><b>Episodes</b> - The number of times we want the agent to play the game</li>
-                        <li><b>Gamma</b> - or decay or discount rate, used to calculate the future 
+                        <li><b>Gamma</b> - or decay or discount rate, used to calculate the future
                             discounted reward</li>
                         <li><b>Epsilon</b> - or exploration rate, this is the rate of random actions taken
                             by the agent</li>
                         <li><b>Epsilon Decay</b> - The decay rate of epsilon, so the
                             number of explorations will decrease as the agent learn</li>
                         <li><b>Minimum Episolon</b> - The minimum value of the exploration rate
-                        to be set</li>
+                            to be set</li>
                         <li><b>Learning Rate</b> - Determines how much the NN learns in each iteration</li>
                     </ul>
 
@@ -253,116 +253,116 @@
 
                     <pre>
                         <code class="wrapper.style5">
-                            model = Sequential()
-                            model.add(Dense(self.hidden_layer, input_dim=self.state_size, activation='relu',
-                                            kernel_initializer='he_uniform'))
-                            model.add(Dense(self.hidden_layer2, activation='relu', kernel_initializer='he_uniform'))
-                            model.add(Dense(self.hidden_layer, activation='relu', kernel_initializer='he_uniform'))
-                            model.add(Dense(self.action_size, activation='linear', kernel_initializer='he_uniform'))
-                            model.summary()
-                            optimizer = Adam(lr=self.learning_rate,amsgrad= self.use_amsgrad)
-                            model.compile(loss='mse', optimizer=optimizer)
-                            return model
+model = Sequential()
+model.add(Dense(self.hidden_layer, input_dim=self.state_size, activation='relu',
+                kernel_initializer='he_uniform'))
+model.add(Dense(self.hidden_layer2, activation='relu', kernel_initializer='he_uniform'))
+model.add(Dense(self.hidden_layer, activation='relu', kernel_initializer='he_uniform'))
+model.add(Dense(self.action_size, activation='linear', kernel_initializer='he_uniform'))
+model.summary()
+optimizer = Adam(lr=self.learning_rate,amsgrad= self.use_amsgrad)
+model.compile(loss='mse', optimizer=optimizer)
+return model
                         </code>
                     </pre>
 
                     <h4>The Memory</h4>
 
-                    <p>One of the challenges for DQN is that neural network used in the algorithm 
-                        tends to forget the previous experiences as it overwrites them with new 
+                    <p>One of the challenges for DQN is that neural network used in the algorithm
+                        tends to forget the previous experiences as it overwrites them with new
                         experiences.</p>
-                    
+
                     <p>To try dealing with that, previous experiences must be kept and used
-                        to retrain the model. That's the memory, which is implemented here 
+                        to retrain the model. That's the memory, which is implemented here
                         as a SumTree.
                     </p>
 
                     <pre>
                         <code>
-                                class Memory:  # stored as ( s, a, r, s_ ) in SumTree
-                                e = 0.01
-                                a = 0.6
-                            
-                                def __init__(self, capacity):
-                                    self.tree = SumTree(capacity)
-                            
-                                def _getPriority(self, error):
-                                    return (error + self.e) ** self.a
-                            
-                                def add(self, error, sample):
-                                    p = self._getPriority(error)
-                                    self.tree.add(p, sample)
-                            
-                                def sample(self, n):
-                                    batch = []
-                                    segment = self.tree.total() / n
-                            
-                                    for i in range(n):
-                                        a = segment * i
-                                        b = segment * (i + 1)
-                            
-                                        s = random.uniform(a, b)
-                                        (idx, p, data) = self.tree.get(s)
-                                        batch.append((idx, data))
-                            
-                                    return batch
-                            
-                                def update(self, idx, error):
-                                    p = self._getPriority(error)
-                                    self.tree.update(idx, p)
+class Memory:  # stored as ( s, a, r, s_ ) in SumTree
+e = 0.01
+a = 0.6
+
+def __init__(self, capacity):
+    self.tree = SumTree(capacity)
+
+def _getPriority(self, error):
+    return (error + self.e) ** self.a
+
+def add(self, error, sample):
+    p = self._getPriority(error)
+    self.tree.add(p, sample)
+
+def sample(self, n):
+    batch = []
+    segment = self.tree.total() / n
+
+    for i in range(n):
+        a = segment * i
+        b = segment * (i + 1)
+
+        s = random.uniform(a, b)
+        (idx, p, data) = self.tree.get(s)
+        batch.append((idx, data))
+
+    return batch
+
+def update(self, idx, error):
+    p = self._getPriority(error)
+    self.tree.update(idx, p)
                         </code>
                     </pre>
 
                     <h4>The Training</h4>
-                    
+
                     <p>For the training, first we let the agent observe the environment,
-                        and store data in its memory. After the agent has stored enough 
+                        and store data in its memory. After the agent has stored enough
                         memory, we start th training.
                     </p>
 
-                    <p>While <b>epsilon</b> is greater than the minimum, we decrease it 
-                    using the decay rate. Then we sample data from the memory and use
-                    this data to train the agent.</p>
+                    <p>While <b>epsilon</b> is greater than the minimum, we decrease it
+                        using the decay rate. Then we sample data from the memory and use
+                        this data to train the agent.</p>
 
                     <pre>
                         <code>
 
-                                # Pick random samples from the replay memory
-                                def train_model(self):
-                                    if self.epsilon > self.epsilon_min:
-                                        self.epsilon *= self.epsilon_decay
-                            
-                                    mini_batch = self.memory.sample(self.batch_size)
-                            
-                                    errors = np.zeros(self.batch_size)
-                                    states = np.zeros((self.batch_size, self.state_size))
-                                    next_states = np.zeros((self.batch_size, self.state_size))
-                                    actions, rewards, dones = [],[],[]
-                            
-                                    for i in range(self.batch_size):
-                                        states[i] = mini_batch[i][1][0]
-                                        actions.append(mini_batch[i][1][1])
-                                        rewards.append(mini_batch[i][1][2])
-                                        next_states[i] = mini_batch[i][1][3]
-                                        dones.append(mini_batch[i][1][4])
-                            
-                                    target = self.model.predict(states)
-                                    target_val = self.target_model.predict(next_states)
-                            
-                                    for i in range(self.batch_size):
-                                        old_val = target[i][actions[i]]
-                                        if dones[i]:
-                                            target[i][actions[i]] = rewards[i]
-                                        else:
-                                            target[i][actions[i]] = rewards[i] + self.discount_factor * np.amax(target_val[i])
-                            
-                                        errors[i]  = abs(old_val - target_val[i][actions[i]])
-                            
-                                    for i in range(self.batch_size):
-                                        idx = mini_batch[i][0]
-                                        self.memory.update(idx, errors[i])
-                            
-                                    self.model.train_on_batch(states, target)
+# Pick random samples from the replay memory
+def train_model(self):
+    if self.epsilon > self.epsilon_min:
+        self.epsilon *= self.epsilon_decay
+
+    mini_batch = self.memory.sample(self.batch_size)
+
+    errors = np.zeros(self.batch_size)
+    states = np.zeros((self.batch_size, self.state_size))
+    next_states = np.zeros((self.batch_size, self.state_size))
+    actions, rewards, dones = [],[],[]
+
+    for i in range(self.batch_size):
+        states[i] = mini_batch[i][1][0]
+        actions.append(mini_batch[i][1][1])
+        rewards.append(mini_batch[i][1][2])
+        next_states[i] = mini_batch[i][1][3]
+        dones.append(mini_batch[i][1][4])
+
+    target = self.model.predict(states)
+    target_val = self.target_model.predict(next_states)
+
+    for i in range(self.batch_size):
+        old_val = target[i][actions[i]]
+        if dones[i]:
+            target[i][actions[i]] = rewards[i]
+        else:
+            target[i][actions[i]] = rewards[i] + self.discount_factor * np.amax(target_val[i])
+
+        errors[i]  = abs(old_val - target_val[i][actions[i]])
+
+    for i in range(self.batch_size):
+        idx = mini_batch[i][0]
+        self.memory.update(idx, errors[i])
+
+    self.model.train_on_batch(states, target)
                             
                         </code>
                     </pre>
@@ -372,50 +372,45 @@
                     <p>
                         As said in <a href='#hyper_par'>Hyperparameters</a>, we use the exploration
                         rate do decide if the agent will take a random action or will pick the action
-                        with the highest reward.  
+                        with the highest reward.
                     </p>
 
                     <p>
                         Since in the beginning the agent has no knowledge about the environment,
                         the exploration rate is set to <b>1</b>, or, <b>100 %</b>, so that the agent
                         will try all sorts of things and should be able to start seeing patterns, which
-                        in the future should be used to predict its actions. 
+                        in the future should be used to predict its actions.
                     </p>
 
                     <pre>
                         <code>
-                                # Get action from model using epsilon-greedy policy
-                                def get_action(self, state):
-                                    if np.random.rand() <= self.epsilon:
-                                        return random.randrange(self.action_size)
-                                    else:
-                                        q_value = self.model.predict(state)
-                                        return np.argmax(q_value[0])
+# Get action from model using epsilon-greedy policy
+def get_action(self, state):
+    if np.random.rand() <= self.epsilon:
+        return random.randrange(self.action_size)
+    else:
+        q_value = self.model.predict(state)
+        return np.argmax(q_value[0])
                         </code>
                     </pre>
 
                     <h4>The Complete Code</h4>
-                    
-                    <p>The complete code can be found in my <a href="https://github.com/idlerghost/DiscreteSolver" target="_blank" 
-                    class="icon fa-github">Github page</a></p>
+
+                    <p>The complete code can be found in my <a href="https://github.com/idlerghost/DiscreteSolver"
+                            target="_blank" class="icon fa-github">Github page</a></p>
 
                     <h4>Results</h4>
-                    
+
                     <figure>
-                            <img src="images/discrete_solver/cartpole_v0_sol.png" 
-                            alt="Cartpole-v0 Simulation Results", 
+                        <img src="images/discrete_solver/cartpole_v0_sol.png" alt="Cartpole-v0 Simulation Results" ,
                             style="width:320px;height:240px;">
-                            <img src="images/discrete_solver/cartpole_v1_sol.png" 
-                            alt="Cartpole-v1 Simulation Results", 
+                        <img src="images/discrete_solver/cartpole_v1_sol.png" alt="Cartpole-v1 Simulation Results" ,
                             style="width:320px;height:240px;">
-                            <img src="images/discrete_solver/mountaincar-v0_sol.png" 
-                            alt="Cartpole-v1 Simulation Results", 
+                        <img src="images/discrete_solver/mountaincar-v0_sol.png" alt="Cartpole-v1 Simulation Results" ,
                             style="width:320px;height:240px;">
-                            <img src="images/discrete_solver/acrobot_v1_sol.png" 
-                            alt="Cartpole-v1 Simulation Results", 
+                        <img src="images/discrete_solver/acrobot_v1_sol.png" alt="Cartpole-v1 Simulation Results" ,
                             style="width:320px;height:240px;">
-                            <img src="images/discrete_solver/lunarlander_v2_sol.png" 
-                            alt="Cartpole-v1 Simulation Results", 
+                        <img src="images/discrete_solver/lunarlander_v2_sol.png" alt="Cartpole-v1 Simulation Results" ,
                             style="width:320px;height:240px;">
                     </figure>
 
@@ -433,7 +428,8 @@
         <!-- Footer -->
         <footer id="footer">
             <ul class="icons">
-                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span class="label">Github</span></a></li>
+                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span
+                            class="label">Github</span></a></li>
                 <!--
 				<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
                 <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
