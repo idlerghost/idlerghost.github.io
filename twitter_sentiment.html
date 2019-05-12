@@ -78,23 +78,44 @@
         <article id="main">
             <header>
                 <h2>Twitter Sentiment</h2>
-                <p>A simple twitter sentiment analisys. This project is still under development</p>
+                <p>The focus of this project is the visualization of the twitter sentiment data</p>
             </header>
             <section class="wrapper style5">
                 <div class="inner">
 
                     <h3>The Project</h3>
-                    <p>
-                        The ideia of the project is to collect data about a subject on twitter and make analisys based on the sentiment of the tweets collected.
+
+                    <p>I started this project with one idea but as I was progressing it started to get bigger, more complex, kinda 
+                        out of hand, so I decided for this one, to stick to my original goal which was to mine 
+                        some tweets, do a simple twitter sentiment analisys using some famous package 
+                        and visualize the data.
                     </p>
 
                     <p>
-                        Most of what I'm doing is based on <a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
-                            Ricky Kim's tutorials<a />
+                        <b>TextBlob</b> was used for the classification, but as I was looking at <a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
+                        Ricky Kim's tutorials</a> I started to question the accuracy of <b>TextBlob</b> and so the accuracy of the results I got using it. That was when things started 
+                        getting out of the hand and I started thinking about other options, but I was said, I decided to stick with the original plan,
+                        so to not make this project too long or too time consuming,
+                        and then do other projects focused on analising through classifying models.
                     </p>
+
+                    <p>
+                        I'm sharing this, so, as I did, you may question the accuracy of the results you will be looking at(it is a nice exercise),
+                        and also so that you keep in mind that the focus of this project was to simply visualize the results in different ways(it's always 
+                        nice to get some pratice in ways to visualize data), 
+                        if you want something more accurate
+                        you might use some famous tweeter database, I didn't because I thought I might be more fun not to.
+                    </p>
+
+                    <p>
+                        Also, keep in mind that as I used <b>Avanges: Endgame</b> tweets as base, you might see some spoilers ahead, so if you
+                        didn't watch the movie, you might not want to look at the results.
+                    </p>
+
 
                     <p id='list_topics'>
-                        As the text is really long the following hyperlinks may be of help:
+                        As the text is kinda long, mostly because of the codes, the following links with the topics
+                        discussed may be of help:
                     </p>
 
                     <ul>
@@ -104,39 +125,50 @@
                         <li><a href='#termFreq'>Terms Frequency</a> - Introduction on how to check the frequency of terms used</li>
                         </ul>
 
-                        <p>
-                            As I progress on this project I plan on updating this website
-                        </p>
-
-
                         <hr />
 
                         <h4 id='collectData'>Collecting data</h4>
 
                         <p>
                             The first step is to collect the data to be analised. As, at the time Avangers: Endgame is a hot topic, I decided to collect tweets about that. Because of the user agreement, I wont be making available the data I downloaded. In case you want to skip this
-                            step, there are a lot of datasets for this kinda of analisys.
+                            step, there are a lot of datasets for this kinda of analisys, and as a bonus the sentiment, will mostly be also
+                            present, and with a better accuracy I assume.
                         </p>
 
                         <p>
-                            As many do, I used tweepy to download the content, and as Rick, I used sqlite to save the raw data. I'm using <b>wait_on_rate_limit</b> on the API to avoid error code 429, and <b>try</b>,
-                            <b>except</b> to avoid a few others. Error code 503 might still be a problem, in future versions I might think about a way around that.
+                            As many do, I used tweepy to download the content, and as <a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
+                            Ricky Kim's tutorials</a>, I used sqlite to save the raw data. I'm using <b>wait_on_rate_limit</b> on the API to avoid error code 429, and <b>try</b>,
+                            <b>except</b> to avoid a few others. Error code 503 might still be a problem, if I use twitter API in some other project I might try thinking about a way around that.
+                            But the treatment above deal with most cases, so we should be fine.
                         </p>
 
                         <p>
                             The <b>consumer_key</b>, <b>consumer_secret</b>, <b>acess_token</b> and <b>access_secret</b> are the ones you recieved after getting your twitter api account.
+                            I save mine in some other file which is ignored by git as a safety measure, I recomend you do the same or something similar. User input is too troublesome to type
+                            everytime, but it is an option.
+                        </p>
+
+                        <p>
+                            As it might take a while for the download to finish you may choose to do something else, so, I added a beep that will happen after all data is downloaded from twitter.
+                            As commented in the code, you need <b>SoX</b> for it to work. You also might want to tweak the frequency and duration so it won't be annoying.
                         </p>
 
                         <pre>
                         <code class="wrapper.style5">
+import tweepy
+import config
+import sqlite3 as sql
+from langdetect import detect
+import pandas as pd
+
 # Creates the tweepy api
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
+auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
+auth.set_access_token(config.access_token, config.access_secret)
 # wait on rate limit is import to avoid error code 429 from twitter api
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
 # Creates a sqlite conection
-conn = sqlite3.connect('endgame_twt.sqlite')
+conn = sql.connect('data/endgame_twt.sqlite')
 cur = conn.cursor()
 cur.executescript('''
 
@@ -153,7 +185,8 @@ CREATE TABLE Endgame (
 ''')
 
 # Defines the maximum number of itens to iterate
-maxitems = 50000
+maxitems = 20000
+# Need to find a way to deal with code 503
 for tweet in tweepy.Cursor(api.search, q="endgame").items(maxitems):
     # The langdetect may throw error if its unable to detect something, 
     # so we use try to avoid that
@@ -167,32 +200,47 @@ for tweet in tweepy.Cursor(api.search, q="endgame").items(maxitems):
         conn.commit()
     except:
         print("Tweet error")
+
+# Beeps so that you know download has finished
+frequency = 1000 # Hertz
+duration  = 500 # milliseconds
+# SoX must be installed using 'sudo apt-get install sox' in the terminal
+import os
+os.system('play -n synth %s sin %s' % (duration/1000, frequency))        
                         </code>
                     </pre>
-
-                        <p>
-                            <a href='#list_topics'> Go back to the topics list</a>
-                        </p>
 
                         <h4 id='cleanData'>Cleaning the data</h5>
 
                             <p>
-                                After getting the data, its important to clean it as there's a lot of stuff such as emoji's that we want to avoid. We'll be using regular expressions for that, so the first thing is to define a list with expressions that should be removed, like websites,
+                                After getting the data, its important to clean it as there's a lot of stuff such as emoji's that we want to avoid. We'll be using <b>BeautifulSoup</b> and regular expressions for that, so the first thing is to define a list with 
+                                expressions that should be removed, like websites,
                                 mentions and hashtags.
                             </p>
 
                             <p>
-                                After the text is cleaned, we use TextBlob to define the sentiment of the tweet, anything with polarity above zero we'll be classifying as positive, and the opposite is true for the negative.
+                                After the text is cleaned, we use TextBlob to filter only english text and define the sentiment of the tweet, anything with polarity above zero we'll be classifying as positive, and the opposite is true for the negative.
+                                I'll also be making sure that tweets with only rt left are being filtered out as there's no info in that.
+                            </p>
+
+                            <p> 
+                                Then, I'll be using <b>sqlite</b> to save the cleaned data.
                             </p>
 
                             <pre>
                         <code class="wrapper.style5">
-emoticons_str = r"""
-    (?:
-        [:=;] # Eyes
-        [oO\-]? # Nose (optional)
-        [D\)\]\(\]/\\OpP] # Mouth
-    )"""
+import pandas as pd  
+import numpy as np
+import re
+from bs4 import BeautifulSoup
+import sqlite3 as sql
+from nltk.tokenize import WordPunctTokenizer
+from tqdm import tqdm, tnrange
+from textblob import TextBlob
+import time
+
+# Tokenize a text into a sequence of alphabetic and non-alphabetic characters, using the regexp
+tok = WordPunctTokenizer()
 
 # Defines the regex list
 regex_str = [
@@ -230,33 +278,77 @@ def tweet_cleaner(text):
     words = [x for x  in tok.tokenize(letters_only) if len(x) > 1]
     return (" ".join(words)).strip()
 
-# Reads the data saved on the last step
-df = pd.read_csv("./endgame.csv",header=0,
-                usecols=[7],names=['text'])
+# Acess the data from the sql query
+conn = sql.connect('data/endgame_twt.sqlite')
+data  = pd.read_sql('SELECT tweet_text FROM Endgame', conn, columns = ['tweet_text'])
+
+# Rename the text column
+data.rename(columns={'tweet_text':'text'}, inplace=True)
 
 # Cleans the tweet
 print("Cleaning the tweets...\n")
 clean_tweet_texts = []
-for i in range(0,len(df)):
-    temp_text = tweet_cleaner(df['text'][i])
+for i in tqdm(range(0,len(data))):
+    temp_text = tweet_cleaner(data['text'][i])
+    # Some tweets were'nt recieving treatment, so we forcibly apply it
     temp_text = re.sub(combined_pat, '', temp_text)
     clean_tweet_texts.append(temp_text)
 
-clean_df = pd.DataFrame(clean_tweet_texts,columns=['text'])
+clean_data = pd.DataFrame(clean_tweet_texts,columns=['text'])
 
-clean_df.dropna(inplace=True)
-clean_df.reset_index(drop=True,inplace=True)
-clean_df.info()
+# Remove NA values and reset the data frame index
+clean_data.dropna(inplace=True)
+clean_data.reset_index(drop=True,inplace=True)
+
+# Filter only tweets in english
+for i in tqdm(range(len(clean_data))):
+    try:
+        remove = False if TextBlob('your tweet').detect_language() == 'en' else True
+        clean_data.at[i, 'remove'] = remove
+    except:
+        time.sleep(15*60)
+        remove = False if TextBlob('your tweet').detect_language() == 'en' else True
+        clean_data.at[i, 'remove'] = remove
+    # Try to not have the 'too many requests' problem
+    # respecting the server spawmn policy
+    time.sleep(15)
+    if i%500 == 0:
+        time.sleep(15*60)
+
+# Filter only the english tweets
+clean_data = clean_data[(clean_data.remove == False)]
+# Remove texts with only rt left
+clean_data = clean_data[(clean_data.text != 'rt')]
+# Reset the table index
+clean_data.reset_index(drop=True,inplace=True)
+# Remove the column remove, its job is done
+clean_data = clean_data.drop("remove", axis=1)
 
 # See if the polarity is the same after cleaning the text
-for i in range(len(clean_df)):
-    if TextBlob(clean_df.text[i]).sentiment.polarity > 0:
-        sentiment = 1
-    elif TextBlob(clean_df.text[i]).sentiment.polarity < 0:
-        sentiment = 0
+# Its important to remember that the tweet may have polarity 0
+# Because if we did something like:
+# sentiment = 'pos' if TextBlob(clean_data.text[i]).sentiment.polarity > 0 else 'neg'
+# We would classify sentiment with neutral polarity as negative
+for i in tqdm(range(len(clean_data))):
+    if TextBlob(clean_data.text[i]).sentiment.polarity > 0:
+        sentiment = 'pos'
+    elif TextBlob(clean_data.text[i]).sentiment.polarity < 0:
+        sentiment = 'neg'
     else:
-        sentiment = 2
-    clean_df.at[i, 'target'] = sentiment
+        sentiment = 'neu'
+    clean_data.at[i, 'sentiment'] = sentiment
+
+# Saves the cleaned data
+conn_save = sql.connect('data/clean_endgame.sqlite')
+cur = conn.cursor()
+cur.executescript('''
+
+CREATE TABLE Endgame_Clean (
+    text TEXT,
+    sentiment TEXT
+)
+''')
+clean_data.to_sql('Endgame_Clean', conn_save)
                         </code>
                     </pre>
 
@@ -271,15 +363,59 @@ for i in range(len(clean_df)):
                             </p>
 
                             <p>
-                                To make the cloud, we'll be using <b>pyplot</b> to plot the data and <b>NLTK</b>
-                                <b>tokenize</b> to extract the tokens
+                                To make the cloud, we'll be using <b>pyplot</b> to plot the data.
+                                I'll be ploting the most commom words for the tweets with positive, negative and neutral sentiment.
+                                If you remember, some lines above I was questioning the accuracy of the simple <b>TextBlob</b> implementation,
+                                you may start to question that even more now that you see words like <i>suck</i> in the positive word cloud,
+                                that bothers me a little too, but, let's just keep in the mind that the objective in this project is just visualing the results,
+                                I'll focus on more accurate results in my next projects.
+                            </p>
+                            
+                            <p>
+                                Funny thing to notice is, in the positive tweets wordcloud, one of the most frequent terms is <b>Detective Pikachu</b>, but my query was <b>endgame</b>,
+                                so, we might start to think that the group of people that will be watching the <b>Detective Pikachu</b> 
+                                movie is, in great part, the same who watched <b>Avangers: Endgame</b>. I mean, I may be totally wrong, I'm saying this just 
+                                based on the looks of the word cloud, but my point is that, by viewing and analising the data we gather, we can begin to see these kind of
+                                correlations, which may help us understand better a certain group of people.
                             </p>
 
+                            <p>
+                                The images are in the following order:
+                                <ul>
+                                    <li>Pink One - Positive tweets</li>
+                                    <li>Blue One - Negative tweets</li>
+                                    <li>Yellow One - Neutral tweets</li>
+                                </ul>
+                            </p>
+                            
+                            <figure>
+                                <img src="images/twitter_sentiment/pos_wc.png" alt="Positive Word Cloud" 
+                                width = 70%>
+                                <img src="images/twitter_sentiment/neg_wc.png" alt="Negative Word Cloud" 
+                                width = 70%>
+                                <img src="images/twitter_sentiment/neu_wc.png" alt="Neutral Word Cloud" 
+                                width = 70%>
+                            </figure>
+
+                            <p>
+                                The code used to generate the images above is as follows. As it is pretty simple I don't think there is any need to explain each part.
+                            </p>
                             <pre>
                         <code>
+import pandas as pd  
+import numpy as np
+import matplotlib.pyplot as plt
+import sqlite3 as sql
+plt.style.use('fivethirtyeight')
+import re
+from wordcloud import WordCloud
+
+# Acess the data from sql
+conn = sql.connect('data/clean_endgame.sqlite')
+data  = pd.read_sql('SELECT * FROM Endgame_Clean', conn)
 
 # Filter the positive tweets
-pos_tweet = clean_data[clean_data.target == 1]
+pos_tweet = data[data.sentiment == 'pos']
 pos_string = []
 for t in pos_tweet.text:
     pos_string.append(t)
@@ -292,11 +428,9 @@ plt.figure(figsize=(12,10))
 plt.imshow(wordcloud, interpolation="bilinear")
 plt.axis("off")
 plt.show()
-#To save figure
-#plt.savefigure(fname = 'positive_wordcloud.png')
 
 # Filter the negative tweets
-neg_tweets = clean_data[clean_data.target == 0]
+neg_tweets = data[data.sentiment == 'neg']
 neg_string = []
 for t in neg_tweets.text:
     neg_string.append(t)
@@ -309,10 +443,22 @@ plt.figure(figsize=(12,10))
 plt.imshow(wordcloud, interpolation="bilinear")
 plt.axis("off")
 plt.show()
-#To save figure
-#plt.savefigure(fname = 'negative_wordcloud.png')
 
+# Filter the neutral tweets
+neu_tweets = data[data.sentiment == 'neu']
+neu_string = []
+for t in neu_tweets.text:
+    neu_string.append(t)
+    
+neu_string = pd.Series(neu_string).str.cat(sep=' ')
 
+# Makes a word cloud using the negative tweets
+wordcloud = WordCloud(width=1600, height=800,max_font_size=200, colormap='Wistia').generate(neu_string)
+plt.figure(figsize=(12,10))
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+                           
                         </code>
                     </pre>
 
@@ -322,7 +468,574 @@ plt.show()
 
                             <h4 id='termFreq'>Terms Frequency</h4>
 
-                            <p></p>
+                            <p>In order to visualize the data, we need the frequency of the terms,
+                                what kind of words are used and how often are they used, here we'll be using
+                                <b>CountVectorized</b> from <b>sklearn</b> and we'll be removing stop words as they are presumed 
+                                to be uninformative.
+                            </p>
+
+                            <p>
+                                There are a lot of other parameters from <b>CountVectorized</b> you might wish to tweak, but, for this analisys,
+                                I decided to remove only the stop words and use the default for others.
+                            </p>
+
+                            <p>
+                                As usually the database is big, we'll be breaking the data in batches to be processed. We'll be using <b>numpy linspace</b>
+                                for that, as it returns evenly spaced numbers over a specific interval. To turn this process easier,
+                                we'll be ordering the data frame based on the sentiment, so that we'll have something, let's say for an small scale example,
+                                the first 10 lines would be negative sentiment tweets, followed by 7 lines of neutral sentiment tweets and finally 15 lines of positive sentiment tweets.
+                            </p>
+                            <code>
+                                <pre>
+import pandas as pd  
+import numpy as np
+import matplotlib.pyplot as plt
+import sqlite3 as sql
+from tqdm import tqdm, tnrange
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Acess the data from the sql
+conn = sql.connect('data/clean_endgame.sqlite')
+data  = pd.read_sql('SELECT * FROM Endgame_Clean', conn)
+
+# Sort the data by sentiment, so the next steps are easier
+data = data.sort_values(by=data['sentiment'])
+data = data.reset_index(drop=True)
+
+# Extract term frequency for visualization
+# We'll be removing stop words as they are presumed to be uninformative
+cvec = CountVectorizer(stop_words='english')
+cvec.fit(data.text)
+
+# Creates the document matrix
+document_matrix = cvec.transform(data.text)
+
+# Get the beggening and end of the batches. If the data is small enough or your RAM
+# can take it, you can run the whole data, otherwise you should break it into batches.
+start_neg = data[data.sentiment == 'neg'].index.values.astype(int)[0]
+end_neg = data[data.sentiment == 'neg'].index.values.astype(int)[-1]
+start_pos = data[data.sentiment == 'pos'].index.values.astype(int)[0]
+end_pos = data[data.sentiment == 'pos'].index.values.astype(int)[-1]
+start_neu = data[data.sentiment == 'neu'].index.values.astype(int)[0]
+end_neu = data[data.sentiment == 'neu'].index.values.astype(int)[-1]
+
+# Define the negative batch
+neg_batches = np.linspace(start_neg,end_neg+1,100).astype(int)
+# Start the term frequency vector
+neg_tf = []
+# For each term in the batch, calculate the frequency of the term
+for i in tqdm(range(0, len(neg_batches)-1)):
+    batch_result = np.sum(document_matrix[neg_batches[i]:neg_batches[i+1]].toarray(),axis=0)
+    neg_tf.append(batch_result)
+    i += 1
+
+# Define the positive batch
+pos_batches = np.linspace(start_pos,end_pos+1,100).astype(int)
+# Start the term frequency vector
+pos_tf = []
+# For each term in the batch, calculate the frequency of the term
+for i in tqdm(range(0, len(pos_batches)-1)):
+    batch_result = np.sum(document_matrix[pos_batches[i]:pos_batches[i+1]].toarray(),axis=0)
+    pos_tf.append(batch_result)
+    i += 1
+
+# Define the neutral batch
+neu_batches = np.linspace(start_neu,end_neu+1,100).astype(int)
+# Start the term frequency vector
+neu_tf = []
+# For each term in the batch, calculate the frequency of the term
+for i in tqdm(range(0, len(neu_batches)-1)):
+    batch_result = np.sum(document_matrix[neu_batches[i]:neu_batches[i+1]].toarray(),axis=0)
+    neu_tf.append(batch_result)
+    i += 1
+
+# Sum all the arrays to have total the frequency for each word
+neg = np.sum(neg_tf,axis=0)
+pos = np.sum(pos_tf,axis=0)
+neu = np.sum(neu_tf,axis=0)
+
+# Create a term frequency data frame, with the terms and their total, positive and negative
+# frequencies
+term_freq = pd.DataFrame([neg,pos, neu],columns=cvec.get_feature_names()).transpose()
+
+term_freq.columns = ['negative', 'positive', 'neutral']
+term_freq['total'] = term_freq['negative'] + term_freq['positive'] + term_freq['neutral']
+
+# Saves the term frequency
+conn_save = sql.connect('data/freq_endgame.sqlite')
+cur = conn.cursor()
+cur.executescript('''
+
+CREATE TABLE Endgame_Freq (
+    term TEXT,
+    neg_fre TEXT,
+    pos_freq TEXT,
+    neu_freq TEXT,
+    tot_freq TEXT
+)
+''')
+term_freq.to_sql('Endgame_Freq', conn_save)
+                                </pre>
+                            </code>
+
+                            <h4 id='zipfs'>Zipf's Law</h4>
+
+                            <blockquote cite='https://www.britannica.com/topic/Zipfs-law'>
+                                <p><b>Zipf’s law</b>, in probability, assertion that the frequencies <i>f</i> of certain 
+                                events are inversely proportional to their rank <i>r</i>. 
+                                The law was originally proposed by American linguist George Kingsley 
+                                Zipf (1902–50) for the frequency of usage of different words in the 
+                                English language; this frequency is given approximately by <i>f(r) ≅ 0.1/r</i>
+                                </p>    
+                                <p>Thus, the most common word (rank 1) in English, which is <i>the</i>, 
+                                occurs about one-tenth of the time in a typical text; the next most 
+                                common word (rank 2), which is <i>of</i>, occurs about one-twentieth of 
+                                the time; and so forth. Another way of looking at this is that a rank 
+                                <i>r</i> word occurs <i>1/r</i> times as often as the most frequent word, 
+                                so the rank 2 word occurs half as often as the rank 1 word, 
+                                the rank 3 word one-third as often, the rank 4 word one-fourth as often, 
+                                and so forth. Beyond about rank 1,000, the law completely breaks down.</p>
+                            </blockquote>
+
+                            <p>The ideia here is to plot our data and see if it's behaviour follows Zipf's Law.
+                                The dashed line is the expected behaviour from Zipf's Law and the bars are the actual 
+                                behaviour from our data.
+                            </p>
+
+                            <p>For this, we'll be using the term frequency database we built in the last step. Initially I'll plot the 1000 most commom
+                                terms to see if their behaviour seems to follow Zipf's Law, then, I'll plot just the 100 most frequent ones to have 
+                                a closer look. The code is pretty simple and is shown below.
+                            </p>
+
+                            <pre>
+                                <code>
+# Top n tokens in tweets
+n = 100
+y_pos = np.arange(n)
+plt.figure(figsize=(10,8))
+s = 1
+expected_zipf = [term_freq.sort_values(by='total', ascending=False)['total'][0]/(i+1)**s for i in y_pos]
+data_values = term_freq.sort_values(by='total', ascending=False)['total'][:n]
+plt.bar(y_pos, data_values, align='center', alpha=0.5)
+plt.plot(y_pos, expected_zipf, color='r', linestyle='--',linewidth=2,alpha=0.5)
+plt.plot(y_pos, (expected_zipf - data_values), color='g', linestyle='--',linewidth=2,alpha=0.5)
+plt.ylabel('Frequency')
+plt.title('Top ' + str(n) + ' tokens in tweets')
+plt.show()
+                                </code>
+                            </pre>
+              
+                            <p>The results I got can be seen below, it seems like our results follow Zipf's Law,
+                                even when we limit it to 100 tokens, we can see that they follow the trend, but for the 
+                                higher ranked words, the frequency aren't in general, a exact match, as can be seen by the 
+                                green line that represents the difference between the Zipf's law expected value and the value we've gotten
+                                from our data.
+                            </p>
+
+                            <figure>
+                                <img src="images/twitter_sentiment/zipfs1000.png" alt="Zipfs Law 100 token plot" 
+                                width = 70%>
+                                <img src="images/twitter_sentiment/zipfs100.png" alt="Zipfs Law 100 token plot" 
+                                width = 70%>
+                            </figure>
+
+                            <p>
+                                Another important thing when viewing data is the way we are doing that, I mean,
+                                with a simple <b>xy</b> plot we can see that our results aren't an exact match with
+                                Zipf's law, but looking at that plot, it seems like for lower ranked words, our results match the Zipf's law,
+                                let's try an log plot and check if thats the case.
+                            </p>
+
+                            <figure>
+                                <img src="images/twitter_sentiment/zipfs_log.png" alt="Zipfs Law log token plot"
+                                with = 50%>
+                            </figure>
+
+                            <p>
+                                As we can see now more clearly, that is not the case, 
+                                only in a few points our data is an exact match to Zipf's Law,
+                                even though it doesn't look like that in the other plot. I mean, if 
+                                we zoomed the data we might've seen it, but plotting it this way makes
+                                it much more visible, that's why it is important to try other forms of 
+                                plotting and viewing our results, it might make our analisys much
+                                more simple.The code for getting this log plot is shown below.
+                            </p>
+                            <pre>
+                                <code>
+# Zipf plot for tweets tokens
+counts = term_freq.total
+tokens = term_freq.index
+ranks = arange(1, len(counts)+1)
+indices = argsort(-counts)
+frequencies = counts[indices]
+plt.figure(figsize=(8,6))
+plt.ylim(1,10**6)
+plt.xlim(1,10**6)
+loglog(ranks, frequencies)#, marker=".")
+plt.plot([1,frequencies[0]],[frequencies[0],1],color='r')
+title("Zipf plot for tweets tokens")
+xlabel("Frequency rank of token")
+ylabel("Absolute frequency of token")
+grid(True)
+# Add the tokens to the plot, if you do that, it is interesting to
+# uncoment the marker as well
+#for n in list(logspace(-0.5, log10(len(counts)-2), 25).astype(int)):
+#    dummy = text(ranks[n], frequencies[n], " " + tokens[indices[n]], 
+#                 verticalalignment="bottom",
+#                 horizontalalignment="left")
+plt.show()  
+                                </code>
+                            </pre>
+
+                            <h4 id='token_vis'>Token Visualization</h4>
+                            <p>
+                                Now that we've seen the general behaviour of our tokens, let's analise the behaviour of our tokens
+                                according to the sentiment they were present at. The simplest way to do that
+                                is to do a bar plot of the most frequent tokens in positive, negative and neutral tweets and see what shows up.
+                            </p>
+
+                            <pre>
+                                <code>
+# Plot the frequency of the n most frequent negative words
+y_neg = np.arange(n)
+plt.figure(figsize=(12,10))
+plt.bar(y_neg, term_freq.sort_values(by='negative', ascending=False)['negative'][:n], align='center', alpha=0.5)
+plt.xticks(y_neg, term_freq.sort_values(by='negative', ascending=False)['negative'][:n].index,rotation='vertical')
+plt.ylabel('Frequency')
+plt.xlabel('Top ' + str(n) + ' negative tokens')
+plt.title('Top ' + str(n) + ' tokens in negative tweets')
+plt.show()
+
+# plot the frequency of the n most frequent neutral words
+y_neu = np.arange(n)
+plt.figure(figsize=(12,10))
+plt.bar(y_neu, term_freq.sort_values(by='neutral', ascending=False)['neutral'][:n], align='center', alpha=0.5)
+plt.xticks(y_neu, term_freq.sort_values(by='neutral', ascending=False)['neutral'][:n].index,rotation='vertical')
+plt.ylabel('Frequency')
+plt.xlabel('Top ' + str(n) + ' neutral tokens')
+plt.title('Top ' + str(n) + ' tokens in positive tweets')
+plt.show()
+
+# plot the frequency of the n most frequent positive words
+y_pos = np.arange(n)
+plt.figure(figsize=(12,10))
+plt.bar(y_pos, term_freq.sort_values(by='positive', ascending=False)['positive'][:n], align='center', alpha=0.5)
+plt.xticks(y_pos, term_freq.sort_values(by='positive', ascending=False)['positive'][:n].index,rotation='vertical')
+plt.ylabel('Frequency')
+plt.xlabel('Top ' + str(n) + ' positive tokens')
+plt.title('Top ' + str(n) + ' tokens in positive tweets')
+plt.show()
+                                </code>
+                            </pre>
+
+                            <p>
+                                If we look at the results we'll notice the most frequent words are neutral and are present in almost the same frequency
+                                in positive, negative and neutral tweets, and because of that it is hard to say that they are important words
+                                for positive or negative tweets, we need another way to look into the data.
+                            </p>
+                            
+                            <figure>
+                                <img src="images/twitter_sentiment/top_25_pos.png" alt="Top 25 most frequent tokens in positive tweets" 
+                                width = 70%>
+                                <img src="images/twitter_sentiment/top_25_neg.png" alt="Top 25 most frequent tokens in negative tweets" 
+                                width = 70%>
+                                <img src="images/twitter_sentiment/top_25_neu.png" alt="Top 25 most frequent tokens in neutral tweets"
+                                width = 70%>
+                            </figure>
+
+                            <p>
+                                What if we do a <b>xy</b> plot of our frequencies? Would that give us any new insights?
+                            </p>
+
+                            <pre>
+                                <code>
+# Makes a xy plot of the positive vs negative frequency
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="negative", y="positive",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq)
+plt.ylabel('Positive Frequency')
+plt.xlabel('Negative Frequency')
+plt.title('Negative Frequency vs Positive Frequency')
+plt.show()
+
+# Makes a xy plot of the positive vs neutral frequency
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neutral", y="positive",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq)
+plt.ylabel('Positive Frequency')
+plt.xlabel('Neutral Frequency')
+plt.title('Neutral Frequency vs Positive Frequency')
+plt.show()
+
+# Makes a xy plot of the negative vs neutral frequency
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neutral", y="negative",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq)
+plt.ylabel('Negative Frequency')
+plt.xlabel('Neutral Frequency')
+plt.title('Neutral Frequency vs Negative Frequency')
+plt.show()
+                                </code>
+                            </pre>
+
+                            <p>
+                                What our plot give us is basically a line, which says that the words in neutral, positive and negative tweets for our
+                                data are basically present in these three groups with the same frequency. Does that seems right? Is it a sign that our
+                                sentiment classification accuracy wasn't so good? I don't know. Let's view our data in a few more ways before we get into this
+                                discussion.
+                            </p>
+
+                            <figure>
+                                <img src="images/twitter_sentiment/neg_pos.png" alt="XY plot of the frequency of words in 
+                                negative tweets vs the frequency of words in positive tweets" width = 70%>
+                                <img src="images/twitter_sentiment/neu_neg.png" alt="XY plot of the frequency of words in 
+                                neeutral tweets vs the frequency of words in negative tweets" width = 70%>
+                                <img src="images/twitter_sentiment/neu_pos.png" alt="XY plot of the frequency of words in 
+                                neutral tweets vs the frequency of words in positive tweets" width = 70%>
+                            </figure>
+
+                            <p>
+                                Let's focus on the positive vs negative relationship. One other way to view this plot is through 
+                                harmonic mean plot. But first, what is harmonic mean?
+                            </p>
+
+                            <blockquote cite='https://corporatefinanceinstitute.com/resources/knowledge/other/harmonic-mean/'>
+                                <p>
+                                Harmonic mean is a type of average that is calculated by dividing the number 
+                                of values in the data series by the sum of reciprocals <i>(1/x_i)</i> of each 
+                                value in the data series. A harmonic mean is one of the three Pythagorean means 
+                                (the other two are arithmetic mean and geometric mean). The harmonic mean always 
+                                shows the lowest value among the Pythagorean means.
+                                </p>
+                                <p>The harmonic mean is often used to calculate the average of the ratios or rates. 
+                                    It is the most appropriate measure for ratios and rates because it equalizes 
+                                    the weights of each data point. For instance, the arithmetic mean places a 
+                                    high weight to large data points, while geometric mean gives a lower 
+                                    weight to the smaller data points.</p>
+                            </blockquote>
+
+                            <p>
+                                But still, why use it? Suppose you are driving in manhattan.  
+                                All the blocks there going in the same direction are roughly the same length.  
+                                You drive North 20 blocks at a speed of s<sub>i</sub> km/h on the i<sup>th</sup> block.  
+                                Let's say your average speed, S, is the harmonic mean of your speeds.
+                                The harmonic mean is particularly sensitive to a single lower-than average value.  
+                                So your average speed usually won't be too much larger than your slowest speed.
+                            </p>
+
+                            <p>
+                                This sensibility may be able to help us while analising the data, so let's give it a try.
+                            </p>
+
+                            <pre>
+                                <code>
+# Calculate the positive rate of the terms
+term_freq['pos_rate'] = term_freq['positive'] * 1./term_freq['total']
+# Removes words with frequency 0 because they wont have harmonic mean
+term_freq2  = term_freq[term_freq['pos_rate'] > 0]
+#term_freq2.sort_values(by='pos_rate', ascending=False).iloc[:10]
+
+# Calculate the percentage of the positive frequency
+pos_pct  = pd.DataFrame(term_freq2['positive'] * 1./term_freq2['positive'].sum())
+pos_pct.columns = ['pos_freq_pct']
+term_freq2 = pd.DataFrame.merge(term_freq2, pos_pct, left_index=True, right_index=True)
+#term_freq2.sort_values(by='pos_freq_pct', ascending=False).iloc[:10]
+
+# Calculate the harmonic mean of the positive frequency
+pos_harm = pd.DataFrame(term_freq2.apply(lambda x: (hmean([x['pos_rate'], x['pos_freq_pct']])
+                                                                   if x['pos_rate'] > 0 and x['pos_freq_pct'] > 0 
+                                                                   else 0), axis=1), columns = ['pos_hmean'])
+term_freq2 = pd.DataFrame.merge(term_freq2, pos_harm, left_index=True, right_index=True)  
+#term_freq2.sort_values(by='pos_hmean', ascending=False).iloc[:10]
+
+# Calculate the normal cumulative distribution
+term_freq2['pos_rate_normcdf'] = normcdf(term_freq2['pos_rate'])
+term_freq2['pos_freq_pct_normcdf'] = normcdf(term_freq2['pos_freq_pct'])
+term_freq2['pos_normcdf_hmean'] = hmean([term_freq2['pos_rate_normcdf'], term_freq2['pos_freq_pct_normcdf']])
+#term_freq2.sort_values(by='pos_normcdf_hmean', ascending=False).iloc[:10]
+
+# Calculate the negative rate of the terms
+term_freq2['neg_rate'] = term_freq['negative'] * 1./term_freq['total']
+# Removes words with frequency 0 because they wont have harmonic mean
+term_freq2  = term_freq[term_freq['neg_rate'] > 0]
+
+neg_pct  = pd.DataFrame(term_freq2['negative'] * 1./term_freq2['negative'].sum())
+neg_pct.columns = ['neg_freq_pct']
+term_freq2 = pd.DataFrame.merge(term_freq2, neg_pct, left_index=True, right_index=True)
+#term_freq2.sort_values(by='neg_freq_pct', ascending=False).iloc[:10]
+
+
+# Calculate the harmonic mean of the positive frequency
+neg_harm = pd.DataFrame(term_freq2.apply(lambda x: (hmean([x['neg_rate'], x['neg_freq_pct']])
+                                                                   if x['neg_rate'] > 0 and x['neg_freq_pct'] > 0 
+                                                                   else 0), axis=1), columns = ['neg_hmean'])
+term_freq2 = pd.DataFrame.merge(term_freq2, neg_harm, left_index=True, right_index=True)  
+#term_freq2.sort_values(by='neg_hmean', ascending=False).iloc[:10]
+
+# Calculate the normal cumulative distribution
+term_freq2['neg_rate_normcdf'] = normcdf(term_freq2['neg_rate'])
+term_freq2['neg_freq_pct_normcdf'] = normcdf(term_freq2['neg_freq_pct'])
+term_freq2['neg_normcdf_hmean'] = hmean([term_freq2['neg_rate_normcdf'], term_freq2['neg_freq_pct_normcdf']])
+#term_freq2.sort_values(by='pos_normcdf_hmean', ascending=False).iloc[:10]
+
+# Remove old variables
+del pos_pct, pos_harm, neg_pct, neg_harm
+gc.collect()
+
+# Make the harmonic mean plot
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neg_hmean", y="pos_hmean",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq2)
+plt.ylabel('Positive Rate and Frequency Harmonic Mean')
+plt.xlabel('Negative Rate and Frequency Harmonic Mean')
+plt.title('neg_hmean vs pos_hmean')
+
+# Make the cumulative distribution harmonic mean plot
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neg_normcdf_hmean", y="pos_normcdf_hmean",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq2)
+plt.ylabel('Positive Rate and Frequency CDF Harmonic Mean')
+plt.xlabel('Negative Rate and Frequency CDF Harmonic Mean')
+plt.title('neg_normcdf_hmean vs pos_normcdf_hmean')
+                                </code>
+                            </pre>
+
+                            <figure>
+                                <img src="images/twitter_sentiment/neg_pos_hmean.png" alt="Negative vs positive harmonic mean of token frequency" 
+                                width = 70%>
+                            </figure>
+
+                            <p>
+                                Well, this still seems like it is not enough, the relationship still seems pretty linear, but is it completely?
+                                We still have a few tricks under our sleve and there is still a famous guy to use, the CDF.
+                            </p>
+
+                            <blockquote cite="http://alfredessa.com/2017/11/cumulative-distribution-function-what-it-is-and-why-its-important-part-i/">
+                            <p>
+                                Data scientists care about the mean and other measures of central tendency. But they also care about distributions. Although not as well known as some other methods for examining distributions, the cumulative distribution function (CDF) deserves to be in the toolkit of every aspiring data scientist. It also deserves to be in the working vocabulary of every literate data interpreter.
+                            </p>
+                            <p>
+                                At its core data science is reasoning about probabilities. But probabilities are not reclusive creatures. They roam in packs, reinforcing each other additively and cumulatively. CDFs provide a way then to study and understand probabilities in one of their native habitats.
+                            </p>
+                            </blockquote>
+
+                            <p>
+                                Histogram, Kernel Density Estimation (KDE) and Violin Plot (a combination of box and kde) are plots that could give us
+                                a similar view, but I'll go straight to CDF out of preference.
+                            </p>
+
+                            <pre>
+                                <code>
+# Calculate the positive rate of the terms
+term_freq['pos_rate'] = term_freq['positive'] * 1./term_freq['total']
+# Removes words with frequency 0 because they wont have harmonic mean
+term_freq2  = term_freq[term_freq['pos_rate'] > 0]
+#term_freq2.sort_values(by='pos_rate', ascending=False).iloc[:10]
+
+# Calculate the percentage of the positive frequency
+pos_pct  = pd.DataFrame(term_freq2['positive'] * 1./term_freq2['positive'].sum())
+pos_pct.columns = ['pos_freq_pct']
+term_freq2 = pd.DataFrame.merge(term_freq2, pos_pct, left_index=True, right_index=True)
+#term_freq2.sort_values(by='pos_freq_pct', ascending=False).iloc[:10]
+
+# Calculate the harmonic mean of the positive frequency
+pos_harm = pd.DataFrame(term_freq2.apply(lambda x: (hmean([x['pos_rate'], x['pos_freq_pct']])
+                                                            if x['pos_rate'] > 0 and x['pos_freq_pct'] > 0 
+                                                            else 0), axis=1), columns = ['pos_hmean'])
+term_freq2 = pd.DataFrame.merge(term_freq2, pos_harm, left_index=True, right_index=True)  
+#term_freq2.sort_values(by='pos_hmean', ascending=False).iloc[:10]
+
+# Calculate the normal cumulative distribution
+term_freq2['pos_rate_normcdf'] = normcdf(term_freq2['pos_rate'])
+term_freq2['pos_freq_pct_normcdf'] = normcdf(term_freq2['pos_freq_pct'])
+term_freq2['pos_normcdf_hmean'] = hmean([term_freq2['pos_rate_normcdf'], term_freq2['pos_freq_pct_normcdf']])
+#term_freq2.sort_values(by='pos_normcdf_hmean', ascending=False).iloc[:10]
+
+# Calculate the negative rate of the terms
+term_freq2['neg_rate'] = term_freq['negative'] * 1./term_freq['total']
+# Removes words with frequency 0 because they wont have harmonic mean
+term_freq2  = term_freq[term_freq['neg_rate'] > 0]
+
+neg_pct  = pd.DataFrame(term_freq2['negative'] * 1./term_freq2['negative'].sum())
+neg_pct.columns = ['neg_freq_pct']
+term_freq2 = pd.DataFrame.merge(term_freq2, neg_pct, left_index=True, right_index=True)
+#term_freq2.sort_values(by='neg_freq_pct', ascending=False).iloc[:10]
+
+
+# Calculate the harmonic mean of the positive frequency
+neg_harm = pd.DataFrame(term_freq2.apply(lambda x: (hmean([x['neg_rate'], x['neg_freq_pct']])
+                                                            if x['neg_rate'] > 0 and x['neg_freq_pct'] > 0 
+                                                            else 0), axis=1), columns = ['neg_hmean'])
+term_freq2 = pd.DataFrame.merge(term_freq2, neg_harm, left_index=True, right_index=True)  
+#term_freq2.sort_values(by='neg_hmean', ascending=False).iloc[:10]
+
+# Calculate the normal cumulative distribution
+term_freq2['neg_rate_normcdf'] = normcdf(term_freq2['neg_rate'])
+term_freq2['neg_freq_pct_normcdf'] = normcdf(term_freq2['neg_freq_pct'])
+term_freq2['neg_normcdf_hmean'] = hmean([term_freq2['neg_rate_normcdf'], term_freq2['neg_freq_pct_normcdf']])
+#term_freq2.sort_values(by='pos_normcdf_hmean', ascending=False).iloc[:10]
+
+# Remove old variables
+del pos_pct, pos_harm, neg_pct, neg_harm
+gc.collect()
+
+# Make the harmonic mean plot
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neg_hmean", y="pos_hmean",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq2)
+plt.ylabel('Positive Rate and Frequency Harmonic Mean')
+plt.xlabel('Negative Rate and Frequency Harmonic Mean')
+plt.title('neg_hmean vs pos_hmean')
+
+# Make the cumulative distribution harmonic mean plot
+plt.figure(figsize=(8,6))
+ax = sns.regplot(x="neg_normcdf_hmean", y="pos_normcdf_hmean",fit_reg=False, scatter_kws={'alpha':0.5},data=term_freq2)
+plt.ylabel('Positive Rate and Frequency CDF Harmonic Mean')
+plt.xlabel('Negative Rate and Frequency CDF Harmonic Mean')
+plt.title('neg_normcdf_hmean vs pos_normcdf_hmean')
+                                </code>
+                            </pre>
+
+                            <p>
+                                In this plot we can see that the relationship is not so linear, and that there are a few cases
+                                that are more present in the positive tweets than negatives and vice versa. A <b>bokeh</b> plot
+                                seems interesting here as we can toggle through the data and look at the tokens at each point.
+                                I wont be making mine available here as it would slow the page down, but you can have a look at the code
+                                below the image to make your own.
+                            </p>
+
+                            <figure>
+                                    <img src="images/twitter_sentiment/neg_pos_normcdf_hmean.png" alt="Negative vs positive cdf harmonic mean of token frequency" 
+                                    width = 70%>
+                            </figure>
+
+                            <pre>
+                                <code>
+# Make the cumulative distribution harmonic mean plot in bokeh
+color_mapper = LinearColorMapper(palette='Inferno256', low=min(term_freq2.pos_normcdf_hmean), high=max(term_freq2.pos_normcdf_hmean))
+p = figure(x_axis_label='neg_normcdf_hmean', y_axis_label='pos_normcdf_hmean')
+p.circle('neg_normcdf_hmean','pos_normcdf_hmean',size=5,alpha=0.3,source=term_freq2,color={'field': 'pos_normcdf_hmean', 'transform': color_mapper})
+from bokeh.models import HoverTool
+hover = HoverTool(tooltips=[('token','@index')])
+p.add_tools(hover)
+show(p)
+                                </code>
+                            </pre>
+
+                            <p>In any case, our plots had some weird, or unexpected behaviour at some points, which can be a result
+                                of an accuracy not so good, but as classifying data with accuracy will be the topic of
+                                another project, I won't dwell on that, I just think that, if you want to be sure about your accuracy 
+                                you shouldn't use the simply version of TextBlob to classify your data, or, if you do, you should at least
+                                check it's accuracy if it is of importance (which I think would be, in most cases).
+                            </p>
+
+                            <h4>References</h4>
+                            <ul>
+                                <li><a href="https://towardsdatascience.com/yet-another-twitter-sentiment-analysis-part-1-tackling-class-imbalance-4d7a7f717d44">
+                                    Ricky Kim's tutorials</a></li>
+                                <li><a href="https://www.britannica.com/topic/Zipfs-law">Britannica</a>
+                                <li><a href="https://corporatefinanceinstitute.com/resources/knowledge/other/harmonic-mean/">
+                                Corporate Finance Institute</a></li>
+                                <li>
+                                    <a href="http://alfredessa.com/2017/11/cumulative-distribution-function-what-it-is-and-why-its-important-part-i/">
+                                    Malpaso</a>
+                                </li>
+                            </ul>
+
 
                 </div>
             </section>
