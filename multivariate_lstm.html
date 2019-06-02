@@ -1,0 +1,614 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132349739-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-132349739-1');
+    </script>
+
+    <title>Multivariate LSTM - Idler Ghost</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="images/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="images/favicon/manifest.json">
+
+</head>
+
+<body class="is-preload">
+
+    <!-- Page Wrapper -->
+    <div id="page-wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <h1><a href="index.html">Idler Ghost</a></h1>
+            <nav id="nav">
+                <ul>
+                    <li class="special">
+                        <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                        <div id="menu">
+                            <ul>
+                                <!-- Add more pages here as it grows -->
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="python_projectlist.html">Python Projects</a>
+                                    <ul>
+                                        <li><a href="discrete_solver.html">Discrete Solver</a></li>
+                                        <li><a href="twitter_sentiment.html">Twitter Sentiment</a></li>
+                                        <li><a href="multivariate_lstm.html">Multivariate LSTM</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="lua_projectlist.html">Lua Projects</a>
+                                    <ul>
+                                        <li><a href="tetris_lua.html">Tetris</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main -->
+        <article id="main">
+            <header>
+                <h2>MultiVariateLSTM</h2>
+                <p>The idea of this project is to train the LSTM network to act as a synthetic control group</p>
+            </header>
+            <section class="wrapper style5">
+                <div class="inner">
+
+                    <h3>The Project</h3>
+                    <p>
+                        So, I've come across the <a href='http://www.econ.puc-rio.br/uploads/adm/trabalhos/files/td653.pdf'>ArCo</a> 
+                        paper, which is basically a method to estimate thecausal effects of an intervention on a single treated unit 
+                        when a control group is not available. a counterfactual is estimated based on a set of variables 
+                        from a pool of untreated units by means of shrinkage methods, such as the <i>least absolute shrinkage and 
+                        selection operator</i> (LASSO).
+                    </p>
+
+                    <p>Basically what they do is take a bunch of a data and use it to make a synthetic control group, in other words,
+                        they use a bunch of data to estimate a function. Neural networks can do that too, right? And that's when I came up
+                        with this project. The idea here is pretty simple, estimate a function based on other functions.
+                    </p>
+
+                    <h4>The Concept</h4>
+
+                    <p>Let's say I have four functions, <b>w</b>, <b>x</b>, <b>y</b> and <b>z</b>. Until a certain time instant
+                    <b>t</b> I will have the value of the four functions, but after said time only the value of <b>w</b>, <b>x</b> and <b>z</b>
+                    will be available, but I'll also be needing the value of <b>y</b> ( In the paper <b>y</b> would suffer an external influence
+                    and to measure it I'd need to know the value of <b>y</b> if said external influence didn't happen). To solve that, I might
+                    write <b>y</b> as a function of <b>w</b>, <b>x</b> and <b>z</b>.</p>
+
+                    <center>y = &beta; w + &alpha; x + &rho; z</center>
+
+                    <p>For this case, let's say that:</p>
+
+                    <center>w = 2k; x = 3k + 4; z = 4k + 2; y = k</center>
+
+                    <p>Which would give us:</p>
+
+                    <center>y = &beta;(2k) + &alpha; (3k +4) + &rho; (4k +2)</center>
+
+                    <center>k = &beta;(2k) + &alpha; (3k +4) + &rho; (4k +2)</center>
+                    
+                    <p>Then, we would be able to write:</p>
+
+                    <center>1 = (2&beta; + 3&alpha; + 4&rho;) and 0 = (4&alpha; + 2&rho;)</center>
+
+                    <p>Then we would find that:</p>
+
+                    <center>&beta; = 3; &alpha; = 1; &rho; = -2</center>
+
+                    <p>Now, for any given value of <b>w</b>, <b>x</b> and <b>z</b> we are able to say the value of <b>y</b>.
+                        In this case it was pretty easy to find the solution but we shouldn't expect it to always be like that.
+                        Truth to be told, depending of our inputs, we shouldn't even expect a true solution, it would be too hard, but
+                        a good approximation is enough. That is our goal here, to use Neural Networks to approximate our true function <b>y</b>.
+                    </p>
+                    
+                    <h4>The Goal</h4>
+
+                    <p>As I've said before, our goal here is to find <b>ŷ</b>, an approximation of the <b>y</b> function (using otherfunctions) that is close
+                    enough for us to use as a synthetic control group. Basically if we have <i>i</i> functions we are trying to write <y> as follows:</y></p>
+                    
+                    <center>ŷ = &beta;<sub>1</sub>z<sub>1</sub> + &beta;<sub>2</sub>z<sub>2</sub> + ... + &beta;<sub>i</sub>z<sub>i</sub></center>
+                    
+                    <p>But how will we be applying it? I mean, I could write the functions from the example and train my network 
+                        for that case, but it would be too simple. So for a bit more of a challange, let's try to approximate the Stock value
+                        of a bank using other banks stock value as input.
+                    </p>
+
+                    <p>The data I used can be found in my <a href="https://github.com/idlerghost/MultiVariateLSTM"
+                        target="_blank" class="icon fa-github">Github page</a>, or you can search for US Stock Market Database, 
+                        I don't remember how I got mine but it was somewhere on <a href='https://www.kaggle.com/'>Kaggle</a>.</p>
+
+                    <h4>Choosing the Network</h4>
+
+                    <p>The first step here is to choose which network we'll be using. Our problem is a timeseries regression problem,
+                        with that in mind, <i>Recurrent Neural Networks</i> (RNN) seems like the to go option. From those, I'll be using
+                        LSTM, as you probably guessed from the project name. The reasons for that are:
+                    </p>
+
+                    <ul>
+                        <li>RNN’s (LSTM’s) are pretty good at extracting patterns in input feature space, where the input data spans over long sequences. Given the gated architecture of LSTM’s that has this ability to manipulate its memory state, they are ideal for such problems</li>
+                        <li>LSTMs can almost seamlessly model problems with multiple input variables. This adds a great benefit in time series forecasting, where classical linear methods can be difficult to adapt to multivariate or multiple input forecasting problems.</li>
+                    </ul>
+
+                    <h4>Coding</h4>
+
+                    <p>Before we get into the code, I'll leave here all the imports we'll be using in this project.
+                        As I did my simulations on <a href='https://colab.research.google.com'>Colab</a>, I set the
+                        resolution of <i>pyplot</i> so the images would be bigger.
+                    </p>
+
+                    <p>This will also reflect on the way I've read my data, but as it is a simple act, I'll assume
+                        you won't have a problem with it.
+                    </p>
+
+                    <div id="spoiler" style="display:none">
+                        
+                    <pre>
+                        <code>
+# Load the packages
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import sklearn.metrics as sklm
+import io
+import keras
+from numpy import array
+from numpy import hstack
+from keras.models import Sequential
+from keras.layers import LSTM, Dropout
+from keras.layers import Dense
+from keras.callbacks import ModelCheckpoint, EarlyStopping
+plt.rcParams['figure.dpi'] = 150 # To force the size of plots
+                        </code>
+                    </pre>
+                        
+                    </div>
+                      
+                    <button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler') .style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}">Imports</button>
+                    
+                    <p>First we load the data. I've chosen Loads OFC Bancorp (OFG), Bradesco Pfd ADR (BBD), Bradesco ADR (BBDO), Royal Bank of Canada (RY), US Bancorp (USB), JP Morgan & Co (JPM), Cit Group Inc (CIT) and Bank of Montreal (BMO) stock data.</p>
+
+                    <pre>
+                        <code>
+# Loads the data
+ofg  = pd.read_csv(io.BytesIO(uploaded['ofg.txt']), sep = ',')
+bbd  = pd.read_csv(io.BytesIO(uploaded['bbd.txt']), sep = ',')
+td   = pd.read_csv(io.BytesIO(uploaded['td.txt']), sep = ',')
+ry   = pd.read_csv(io.BytesIO(uploaded['ry.txt']), sep = ',')
+usb  = pd.read_csv(io.BytesIO(uploaded['usb.txt']), sep = ',')
+jpm  = pd.read_csv(io.BytesIO(uploaded['jpm.txt']), sep = ',')
+cit  = pd.read_csv(io.BytesIO(uploaded['cit.txt']), sep = ',')
+bmo  = pd.read_csv(io.BytesIO(uploaded['bmo.txt']), sep = ',')
+                        </code>
+                    </pre>
+
+                    <p>I'll filter out data before '2009-12-10' to try avoiding the noise that the 2008 crisis may bring 
+                        in our data. 
+                    </p>
+
+                    <pre>
+                        <code>
+# Filter only data after 2009-12-10
+ofg = ofg[(ofg.Date > '2009-12-10')]
+bbd = bbd[(bbd.Date > '2009-12-10')]
+td  = td[(td.Date > '2009-12-10')]
+ry  = ry[(ry.Date > '2009-12-10')]
+usb = usb[(usb.Date > '2009-12-10')]
+jpm = jpm[(jpm.Date > '2009-12-10')]
+cit = cit[(cit.Date > '2009-12-10')]
+bmo = bmo[(bmo.Date > '2009-12-10')]
+                        </code>
+                    </pre>
+
+                    <p>What will do here is take the daily close value of 7 of our 8 bank's stocks and try to approximate the 8th using the first 7. I've chosen to try approximating BMO data for no specific reason. Its important to make sure that all our data belong to the same time series and have the same length, otherwise our network will be confused. To make sure of that, I'll be merging all data with our desired bank and checking to see if every result has the same length
+                        (it is expected that they will have the same length).
+                    </p>
+<pre>
+    <code>
+# Merge the data to make sure every date is commom with our target
+ofg = pd.merge(ofg, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+bbd = pd.merge(bbd, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+td  = pd.merge(td, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+ry  = pd.merge(ry, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+usb = pd.merge(usb, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+jpm = pd.merge(jpm, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+cit = pd.merge(cit, bmo, on=['Date'], how='inner', suffixes = ('', '_bmo'))
+    </code>
+</pre>
+
+<p>Now that we have made sure that all data belongs to the same time series I'll start preparing the data for the network. First I'll transform the data into a sequence and filter out the last 100 values, as we'll be using those later to check how our network does after training.</p>
+                    
+<pre>
+    <code>
+in_seq1 = array(ofg.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq2 = array(bbd.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq3 = array(td.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq4 = array(ry.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq5 = array(usb.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq6 = array(jpm.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+in_seq7 = array(cit.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+out_seq = array(bmo.Close.tolist()[1:int(len(ofg.Close.tolist())-100)])
+
+# convert to [rows, columns] structure
+in_seq1 = in_seq1.reshape((len(in_seq1), 1))
+in_seq2 = in_seq2.reshape((len(in_seq2), 1))
+in_seq3 = in_seq3.reshape((len(in_seq3), 1))
+in_seq4 = in_seq4.reshape((len(in_seq4), 1))
+in_seq5 = in_seq5.reshape((len(in_seq5), 1))
+in_seq6 = in_seq6.reshape((len(in_seq6), 1))
+in_seq7 = in_seq7.reshape((len(in_seq7), 1))
+out_seq = out_seq.reshape((len(out_seq), 1))
+# horizontally stack columns
+dataset = hstack((in_seq1, in_seq2, in_seq3, in_seq4, in_seq5, in_seq6, in_seq7, out_seq))
+    </code>
+</pre>
+
+<p>
+    It is important to remember that the LSTM will learn a function that maps a sequence of past observations as inputs to an output observation.
+    As such, the sequence of observations must be transformed into multiple examples from which the LSTM can learn. Consider the given univariate sequence:
+</p>
+
+<center>[1, 2, 3, 4, 5, 6]</center>
+
+<p>We can divide the sequence into multiple input/output patterns called samples, where <b>n</b> timesteps are
+used as input and one time step is used as output for the one-step prediction that is being learned. Consider that for this case,
+the time step for the input is 3. This give us:</p>
+
+<table style='width:50%'>
+    <tr>
+      <th>X</th>
+      <th>y</th>
+    </tr>
+    <tr>
+      <td>1, 2, 3</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>2, 3, 4</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>3, 4, 5</td>
+      <td>6</td>
+    </tr>
+  </table>
+
+<p>To apply this idea to our data we'll be defining a function to split it into samples.</p>
+
+<pre>
+    <code>
+# split a multivariate sequence into samples
+def split_sequences(sequences, n_steps):
+	X, y = list(), list()
+	for i in range(len(sequences)):
+		# find the end of this pattern
+		end_ix = i + n_steps
+		# check if we are beyond the dataset
+		if end_ix > len(sequences):
+			break
+		# gather input and output parts of the pattern
+		seq_x, seq_y = sequences[i:end_ix, :-1], sequences[end_ix-1, -1]
+		X.append(seq_x)
+		y.append(seq_y)
+	return array(X), array(y)
+    </code>
+</pre>
+
+<p>Now we use our newly defined function to prepare our data. We also define our parameters, like number of steps 
+    and number of features to be used in the network.
+</p>
+
+<pre>
+    <code>
+# choose a number of time steps
+n_steps = 1
+# convert into input/output
+X, y = split_sequences(dataset, n_steps)
+# the dataset knows the number of features, e.g. 2
+n_features = X.shape[2]
+    </code>
+</pre>
+
+<p>
+    We now build our network. If we have more data we can add the parameter <b>validation_data=(X_val, y_val)</b> to 
+    our <b>model.fit</b> to validate our results. In this case I'll be using the validation split parameter. 
+    The early stopping method makes sure that if our training data doesn't improve after <b>patience</b> (in this case, 10) 
+    epochs, the training will end. The mode will be <b>min</b> since we want to decrease the training loss. If you decide to
+    work with accuracy be sure to set the mode to <b>max</b> as you will want to increase it. If you just don't want to worry
+    about it, set it to <b>auto</b> and let <b>Keras</b> check the correct one. We set the restore best weigths to True since 
+    we want our network to have it's best parameters after training.
+</p>
+
+<pre>
+    <code>
+#Defines the optimizer
+# Original values are lr = 0.001, beta_1 =0.9, beta_2 = 0.99 epsilon = none with decay =0 and amsgrad = False
+opt = keras.optimizers.Adam(lr=0.0001, beta_1=0.99, beta_2=0.999, epsilon=0.1, decay=0, amsgrad=False)
+# define model
+model = Sequential()
+#model.add(LSTM(1024, activation='relu', input_shape=(n_steps, n_features), return_sequences = True))
+#model.add(Dropout(rate = 0.3))
+model.add(LSTM(1024, activation='relu', input_shape=(n_steps, n_features), return_sequences = True))
+model.add(Dropout(rate = 0.3))
+model.add(LSTM(1024, activation='relu', input_shape=(n_steps, n_features)))
+model.add(Dropout(rate = 0.3))
+model.add(Dense(1, activation = 'linear'))
+model.compile(optimizer=opt, loss='mse', metrics=['accuracy'])        
+    </code>
+</pre>
+
+<p>Besides the early stopping we add the model checkpoint to make sure our weigths are saved each time they improve.
+    The model.fit is saved so we'll be able to plot our loss function later.
+</p>
+
+<pre>
+    <code>
+early_stopping  = EarlyStopping(monitor='val_loss', min_delta=0,patience=10, verbose=1, mode='min', restore_best_weights = True)
+filepath="lstm_best_weights.{epoch:02d}-{val_loss:.4f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+history = model.fit(X, y, batch_size = batch_size,validation_split=0.33, epochs=1000, callbacks = [checkpoint, early_stopping])
+    </code>
+</pre>
+
+<p>After the network finishes training, we plot our loss function. If you want to plot the accuracy too, just write 'acc' instead of 'loss'</p>
+
+<pre>
+    <code>
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+    </code>
+</pre>
+
+<figure>
+    <img src="images/multivariate_lstm/model_loss.png" alt="Violin model loss">
+</figure>
+
+<p>We also plot our loss as a violin plot to look at it's distribution and probability density</p>
+
+<pre>
+    <code>
+fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(7, 7))
+
+# plot violin plot
+axes[0,0].violinplot(history.history['loss'],
+                   showmeans=False,
+                   showmedians=True)
+axes[0,0].set_title('loss')
+
+# plot box plot
+axes[0,1].boxplot(history.history['loss'])
+axes[0,1].set_title('loss')
+
+# plot violin plot
+axes[1,0].violinplot(history.history['val_loss'],
+                   showmeans=False,
+                   showmedians=True)
+axes[1,0].set_title('val_loss')
+
+# plot box plot
+axes[1,1].boxplot(history.history['val_loss'])
+axes[1,1].set_title('val loss')
+plt.show()
+    </code>
+</pre>
+
+<figure>
+    <img src="images/multivariate_lstm/model_loss_violin.png" alt="Violin model loss">
+</figure>
+
+<p>We can notice that our loss at the end is very small, which is a good sign. If you 
+    remember from our model, we set our loss function as the Mean Squared Error (MSE), which means
+    that the mse of our true function <b>y</b> and our approximation <b>ŷ</b> is low. Let's check it
+    trying to predict those last 100 points of our data I've removed earlier from training.
+</p>
+
+<pre>
+    <code>
+# define input sequence
+in_seq1 = array(ofg.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq2 = array(bbd.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq3 = array(td.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq4 = array(ry.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq5 = array(usb.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq6 = array(jpm.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+in_seq7 = array(cit.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+out_seq = array(bmo.Close.tolist()[int(len(ofg.Close.tolist())-100):int(len(ofg.Close.tolist()))])
+# convert to [rows, columns] structure
+in_seq1 = in_seq1.reshape((len(in_seq1), 1))
+in_seq2 = in_seq2.reshape((len(in_seq2), 1))
+in_seq3 = in_seq3.reshape((len(in_seq3), 1))
+in_seq4 = in_seq4.reshape((len(in_seq4), 1))
+in_seq5 = in_seq5.reshape((len(in_seq5), 1))
+in_seq6 = in_seq6.reshape((len(in_seq6), 1))
+in_seq7 = in_seq7.reshape((len(in_seq7), 1))
+out_seq = out_seq.reshape((len(out_seq), 1))
+# horizontally stack columns
+dataset = hstack((in_seq1, in_seq2, in_seq3, in_seq4, in_seq5, in_seq6, in_seq7, out_seq))
+# convert into input/output
+x_input, y_output = split_sequences(dataset, n_steps)
+yhat = model.predict(x_input, verbose=0)
+    </code>
+</pre>
+
+<p>Let's plot all of our data to visualize our results.</p>
+
+<pre>
+    <code>
+plt.plot(y_output, label = 'expected result - BMO', c = 'b')
+plt.plot(in_seq1, label = 'reference 1 - OFG', c = 'g', linestyle = ':')
+plt.plot(in_seq2, label = 'reference 2 - BBD', c = 'black', linestyle = ':')
+plt.plot(in_seq3, label = 'reference 3 - TD', c = 'yellow', linestyle = ':')
+plt.plot(in_seq4, label = 'reference 4 - RY', c = 'cyan', linestyle = ':')
+plt.plot(in_seq5, label = 'reference 5 - USB', c = 'pink', linestyle = ':')
+plt.plot(in_seq6, label = 'reference 6 - JPM', c = 'orange', linestyle = ':')
+plt.plot(in_seq7, label = 'reference 7 - CIT', c = 'grey', linestyle = ':')
+plt.plot(yhat, label = 'network output - BMO hat', c = 'r')
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+plt.show()
+    </code>
+</pre>
+
+<figure>
+    <img src="images/multivariate_lstm/predict_data_plot.png" alt="Predicted data plot">
+</figure>
+
+<p>If looks like our <b>ŷ</b> function has a behaviour similar to that of our <b>y</b> function,
+but if mimicks mostly the stock data from <b>RY</b>. Lets plot our functions
+as a violin plot to look at it's distribution and probability density</p>
+
+<pre>
+    <code>
+fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(7, 7))
+
+# plot violin plot
+axes[0,0].violinplot(df.y,
+                   showmeans=False,
+                   showmedians=True)
+axes[0,0].set_title('y')
+
+# plot box plot
+axes[0,1].boxplot(df.y)
+axes[0,1].set_title('y')
+
+# plot violin plot
+axes[1,0].violinplot(df.yhat,
+                   showmeans=False,
+                   showmedians=True)
+axes[1,0].set_title('y hat')
+
+# plot box plot
+axes[1,1].boxplot(df.yhat)
+axes[1,1].set_title('y hat')
+plt.show()
+    </code>
+</pre>
+
+<figure>
+    <img src="images/multivariate_lstm/predict_data_violin.png" alt="Predicted data violin plot">
+</figure>
+
+<p>If we use sklearn regression metrics we'll be able to see that as expected our mse is low.</p>
+
+<pre>
+    <code>
+print('SKLearn Regression metrics: \n')
+print('Mean Squared Error: ' + str(sklm.mean_squared_error(df.y, df.yhat)) + '\n')
+print('Explained Variance Score: ' + str(sklm.explained_variance_score(df.y, df.yhat)) + '\n')
+print('Max Error: ' + str(sklm.max_error(df.y, df.yhat)) + '\n')
+print('Mean Absolute Error: ' + str(sklm.mean_absolute_error(df.y, df.yhat)) + '\n')
+print('Mean Squared Log Error: ' + str(sklm.mean_squared_log_error(df.y, df.yhat)) + '\n')
+print('Median Absolute Error : ' + str(sklm.median_absolute_error(df.y, df.yhat)) + '\n')
+print('R2 Score: ' + str(sklm.r2_score(df.y, df.yhat)) + '\n')
+    </code>
+</pre>
+
+<p>SKLearn Regression metrics: </p>
+
+<ul>
+    <li>Mean Squared Error: 2.721030213244895</li>
+
+    <li>Explained Variance Score: 0.4574537965733003</li>
+    
+    <li>Max Error: 3.0101074218750057</li>
+    
+    <li>Mean Absolute Error: 1.4785971740722652</li>
+    
+    <li>Mean Squared Log Error: 0.0004740291255383459</li>
+    
+    <li>Median Absolute Error : 1.5499928588867107</li>
+    
+    <li>R2 Score: 0.4413083095424465</li>
+</ul>
+
+<p>Even though our function <b>ŷ</b> seems like a good approximation of <b>y</b> it is
+important to notice that neither their distribution nor probability density are similar and
+depending of the application that may be a problem.</p>
+
+
+
+<h4>The Complete Code</h4>
+
+
+                            <p>The complete code can be found in my <a href="https://github.com/idlerghost/MultiVariateLSTM"
+                                    target="_blank" class="icon fa-github">Github page</a></p>
+
+                            <h4>References</h4>
+                            <ul>
+                                <li><a href='http://www.econ.puc-rio.br/uploads/adm/trabalhos/files/td653.pdf'>ARCO</a>: An Artificial Counterfactual Approach for High-Dimensional Panel Time-Series Data
+                            </ul>
+
+
+                </div>
+            </section>
+        </article>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <ul class="icons">
+                <li><a href="https://github.com/idlerghost" target="_blank" class="icon fa-github"><span
+                            class="label">Github</span></a></li>
+                <!--
+				<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+                <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+				<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+                <li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
+                <li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+				-->
+            </ul>
+            <ul class="copyright">
+                <li>&copy; IdlerGhost</li>
+                <li>Design adapted from: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
+            </ul>
+        </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- Using scripts from HTML5 UP Spectral for the time being -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
